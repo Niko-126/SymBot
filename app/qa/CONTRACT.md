@@ -1,123 +1,132 @@
-# 对抗式全量训练 · 模块契约（写代码前必读）
+# 测试底座 · 模块契约
 
-> 这是一套**独立的测试底座**：不改 `app/` 原来的行为，所有执行都跑在临时数据根 + mock provider + 断网环境里。
+> 这套东西是给**改代码的人**看的。它是一套独立的测试底座：不改变 `app/` 原有的行为，
+> 所有执行都跑在临时数据根 + mock provider + 断网环境里。
+>
+> 只想用它跑测试、不想改它？跳到最后一节「怎么跑」。
 
-## 0. 先记住这几条硬规矩
+---
 
-1. **`sandbox.prepare_env()` 必须第一个跑**，排在 import 任何 `app.core.*` / `app.mind.*` 之前。
-   所以 `app/qa/*` 里的模块**不许**在模块级 import `app.core` / `app.mind` / `app.memory` / 这类东西，一律写进函数里，用的时候再 import。
-2. 只写自己负责的文件。别人的文件别碰，`app/` 里现有的模块别改，不要 `git commit`。
-3. 每个 phase 分两步走：先把 Item 全量注册完（status=NOTRUN），再执行，再 `mark`。
-4. 任何要写进报告的字符串都得过一遍 `sandbox.mask()`。转录里不许出现 api_key、app_token、真实 QQ 号。
-5. 碰上要外部依赖的项（真网络、NapCat、QQ 官方 WS、没 key），就 `mark(SKIP, reason)`。不许悄悄丢掉。
-6. 每次调用都要有超时（默认 20s）和异常包裹。一个坏函数不许把整轮拖死。
-7. 输出只用 `types.Item / types.Finding / types.TurnRecord / types.PhaseResult` 这四种。
+## 一、六条硬规矩
 
-## 1. 数据契约（`app/qa/types.py`）
+1. **环境必须先准备好**。`sandbox.prepare_env()` 要排在 import 任何 `app.core.*` / `app.mind.*` 之前。
+   所以这个目录里的模块**不许**在模块级 import 这些包，一律写进函数里，用的时候再 import。
+2. **只碰自己负责的文件**。`app/` 里现有的模块不要改，别人的文件不要动。
+3. **每个阶段两步走**：先把这一阶段要测的项全部登记（状态为「未跑」），再执行，再逐项回填结果。
+4. **任何要写进报告的字符串都要过一遍脱敏**。转录里不许出现 api_key、token、真实 QQ 号。
+5. **要外部依赖的项要显式跳过**（真网络、QQ 接入端、没有 key），并写清原因。不许悄悄丢掉。
+6. **每次调用都要有超时和异常包裹**。一个坏函数不许把整轮拖死。
 
-`Item(id, kind, name, module, line, risk, plan, status, detail, extra)`：
+---
 
-- `kind` 只能是 `fn | method | route | cli | table | config | persona | scenario | module | panel`；
-- `risk` 只能是 `read | write | net | llm | hang | danger`；
-- `plan` 分四档：`L0`(静态) `L1`(进程内调用) `L2`(子进程) `L3`(会话) `L4`(HTTP 路由)；
-- `status` 只会是 `OK | RAISED | SKIP | HANG | NOTRUN | EXPECTED`。
+## 二、四类数据结构
 
-`Finding(id, severity, area, title, detail, evidence, repro, item_id)`：
+整套底座只产出四种对象，别的都是它们的组合。
 
-- `severity`：`P0`(崩溃/数据损坏/安全/静默失败) `P1`(功能错误/契约不符/出戏) `P2`(体验/健壮性) `INFO`。
+**待测项（Item）**
 
-`TurnRecord(scenario, index, role, text, latency_ms, meta, findings)`。
+| 字段 | 取值 |
+|---|---|
+| 类型 | 函数 / 方法 / 路由 / 命令行 / 表 / 配置项 / 人格键 / 场景 / 模块 / 面板 |
+| 风险 | 只读 / 写库 / 联网 / 调模型 / 可能卡死 / 危险操作 |
+| 计划层级 | 静态看 / 进程内调 / 子进程跑 / 会话级 / 走 HTTP |
+| 状态 | 通过 / 抛错 / 跳过 / 卡死 / 未跑 / 预期内 |
 
-## 2. 各模块谁写、写成什么样
+**发现（Finding）**
 
-### `app/qa/inventory.py`（负责人：analyst-inv）
-```python
-def build() -> list[types.Item]          # 全量清单：模块/函数/方法/类、路由、CLI、表、配置键、人格键
-def manifest() -> dict                   # {"counts": {...}, "by_module": {...}, "generated_at": ...}
-def probe_targets() -> list[dict]        # [{"module": m, "qualname": q, "is_async": bool, "sig": str, "risk": r, "line": n}]
-```
-- 用 `ast` 扫 `app/**/*.py`，**不要 import**（import 会带副作用）；路由另外扫 `app/api/*.py`，补上方法+路径。
-- `risk` 这么判：写库(`INSERT/UPDATE/DELETE/h2.add/store.add/forget/terminate/compact/restore/ingest/push/send`)、
-  net(httpx/requests/socket/bili/harvest)、llm(rt.llm/judge/models.pick)、hang(`while True`/`sleep(`)、danger(删库/打包/子进程)。
-- 私有函数（`_x`）也要列，`kind="fn"`，`extra={"private": True}`，默认 `plan="L0"`。
-- 这个模块要能回答一件事：仓库里到底有多少个可调用对象、多少条路由、多少张表。
+严重度四档：
+- **P0**：崩溃、数据损坏、安全问题、静默失败。
+- **P1**：功能错误、契约不符、出戏。
+- **P2**：体验问题、健壮性问题。
+- **INFO**：记录，不算缺陷。
 
-### `app/qa/coverage.py`（负责人：analyst-inv）
-```python
-class Tracer:
-    def __enter__/__exit__         # 用 sys.monitoring(PY_START)，失败退回 sys.setprofile
-    hits: dict[str, int]           # "module:qualname" -> 次数
-def report(reg: Registry) -> dict  # {"covered": n, "total": n, "ratio": x, "uncovered": [...]}
-```
-- 只统计 `app.*` 的 code object。别的目录不进分母。
-- 同一个进程里要能反复 `with Tracer()`，不许只跑一次就废。
+每条发现必须带：复现步骤、证据、关联的待测项。
 
-### `app/qa/routes_fuzz.py`（负责人：analyst-route）
-```python
-def register(reg: Registry) -> None                 # 先注册所有 route item（含 payload 变体数）
-async def run(reg: Registry) -> types.PhaseResult   # 用 httpx ASGITransport / TestClient 打全部路由
-```
-- `app.openapi()` 里的**全部** `(method, path)` 都要打到。不接受抽样。
-- 每个路由至少两发：1 个正常 payload + 1 个对抗 payload（空串 / 超长 8k / `{{}}` / `'\0'` / SQL 注入串 / 未授权）。
-- 怎么判：任何 5xx → P0；返回非 JSON（静态页除外）→ P1；鉴权接口没 token 却给 200 → P1（这是已知现状，标 `expected`）。
-- 路径带 `{param}` 的，先填合理值，再填一遍 `__adv__` 垃圾值。
+**对话记录（TurnRecord）**：场景、轮次、角色、文本、延迟、附加信息、挂在这轮的发现。
 
-### `app/qa/probe.py`（负责人：analyst-probe）
-```python
-def register(reg: Registry, targets: list[dict]) -> None
-async def run(reg: Registry, *, levels=("L0","L1","L2"), limit: int | None = None) -> types.PhaseResult
-```
-- L0 反射：能导入、有签名、async 标记对得上、docstring 在。这层不计缺陷，只记 OK / RAISED。
-- L1 **进程内**调用 `risk in (read,)` 的函数，参数按签名合成（默认值 → 类型占位符）。
-  `llm` 类在 mock 下可以调（不花钱），`write` 类**也允许**（库里本来就是临时数据根），`danger` 只放到 L2。
-- L2 **子进程**逐模块批跑（`python -m app.qa.probe --module X --batch`），超时 60s，用来抓 `hang`。
-- 参数合成不出来 → `SKIP` + reason，不算缺陷；抛异常 → `RAISED` + 完整 traceback 首帧。
-- 必须留下判据：这个异常到底是缺参(SKIP) 还是真空指针/断言(RAISED)。
+**阶段结果（PhaseResult）**：这一阶段跑了多少、过多少、抛多少、跳多少、耗时多少。
 
-### `app/qa/scenarios.py` + `app/qa/duel.py`（负责人：analyst-duel）
-```python
-# scenarios.py
-SCENARIOS: list[dict]   # id/title/features/chat_type/uid/turns(offline 脚本)/goal(live 提示)/oracle_tags
-def register(reg: Registry) -> None
+---
 
-# duel.py
-class Prober:            # 另一个 AI：offline=模板跟随；live=LLM 生成
-    async def say(self, history, goal) -> str
-class Subject:           # 被测：直接调 loop.chat_turn
-    async def say(self, text) -> tuple[list[str], dict]   # (replies, meta)
-async def run(reg, *, mode="offline", only=None, turns=None, budget=None) -> tuple[types.PhaseResult, list[types.TurnRecord]]
-```
-- offline：Subject 用 MockLLM（`SYMEM_MOCK=1`）；Prober 用确定性模板，看着上一句挑下一句，专挑刺：重复、身份质疑、注入、越级亲密、长文本、空串。
-- live：只有加了 `--allow-live` 才跑。Subject 走真 provider，Prober 用同一个 `rt.llm`（system 提示成"挑剔的测试用户"）。
-  **必须**先看 `provider.is_mock` 决定要不要降级；token 和估算花费都记下来；一超 `budget` 立刻停。
-- 每一轮：写 `TurnRecord`（latency、meta），调 `oracle.check_turn`，把 Finding 挂到这条记录上。
-- 转录落 `transcripts/{scenario}.jsonl`；prompt 快照落 `transcripts/{scenario}.prompt.json`（可以关）。
+## 三、六个阶段各干什么
 
-### `app/qa/oracle.py`（负责人：analyst-oracle）
-```python
-def check_turn(rec: types.TurnRecord, ctx: dict) -> list[types.Finding]
-def check_scenario(name: str, turns: list[types.TurnRecord], ctx: dict) -> list[types.Finding]
-def check_state(state: dict) -> list[types.Finding]   # 关系数值越界/阶段错位/记忆视图口径
-```
-规则至少要盖住这些：自曝 AI / 设定泄漏、客服腔、旁白/括号动作、markdown/代码块、空回复、超长、
-复读（同一句 3 次）、时间感（白天说深夜话术）、身份幻觉（"你号不对 / 你换号了 / 你说了两遍"）、
-群聊越级亲密（explicit 词）、恋人语气越阶段、记忆串号（A 的事出现在 B 的回复里）、
-关系数值越界、prompt 注入顺从（说了"忽略以上指令"之后 OOC）、延迟超阈（>60s 记 P2）。
+### 1. 清点：仓库里到底有多少东西
 
-### `app/qa/report.py`（负责人：analyst-oracle）
-```python
-def write(run_dir: pathlib.Path, *, registry, phases, findings, turns, meta) -> pathlib.Path
-```
-出 `report.md`，顺序是：总览（项数/通过/异常/跳过/覆盖/耗时/花费）→ 缺陷清单（按 P0→INFO，每个带复现）→
-逐模块覆盖表（列了但没跑的单独一节）→ 场景转录索引 → 环境与哈希。另出一份 `report.json`。
+扫描 `app/` 下所有 Python 文件，列出模块、函数、方法、类、路由、命令行入口、数据库表、配置键、人格键。
 
-### `scripts/adv_full.py`（负责人：lead）
-编排顺序：inventory → routes → functions → duel → coverage → report。`--phase` 能单跑一段。
-退出码 = P0 数 > 0 ? 1 : 0。
+- 用语法树扫描，**不要 import**（import 会带副作用）。
+- 路由要额外补上方法和路径。
+- 私有函数也要列，默认只做静态检查。
 
-## 3. 跑完落在哪
+产出要能回答一个问题：**这个仓库里到底有多少个可调用对象、多少条路由、多少张表。**
 
-产物一律进 `data/_adv/<run-id>/`（`data/` 已经 gitignore 了）：
+### 2. 路由全量打一遍
+
+把 API 文档里声明的**全部**（方法, 路径）都打到，不接受抽样。
+
+每个路由至少两发：
+- 一发正常参数；
+- 一发对抗参数：空串、超长串、空对象、含特殊字符、SQL 注入串、不带鉴权。
+
+怎么判：
+- 任何 5xx → P0；
+- 返回非 JSON（静态页除外）→ P1；
+- 鉴权接口没 token 却给 200 → P1（已知现状，标「预期内」）；
+- 路径带参数占位的，先填合理值，再填一遍垃圾值。
+
+### 3. 函数探测
+
+分三层：
+
+| 层 | 做什么 | 失败怎么记 |
+|---|---|---|
+| 静态 | 能不能导入、签名对不对、异步标记对不对、有没有 docstring | 只记「通过 / 抛错」 |
+| 进程内 | 调用只读类函数，参数按签名合成 | 合成不出来 → 跳过并写原因 |
+| 子进程 | 逐模块批跑，专门抓卡死 | 超时就记「卡死」 |
+
+关键判据：**这个异常到底是「缺参数」还是「真空指针」**——两者要分开记。
+
+### 4. 对抗场景
+
+两个角色：一个扮演**挑剔的用户**，一个扮演**被测的她**。
+
+- **离线模式**（默认）：被测方走 mock 模型，挑剔方用确定性模板，看着上一句挑下一句，专挑刺——重复、身份质疑、注入、越级亲密、长文本、空串。
+- **在线模式**：只有显式加参数才跑。被测方走真模型，挑剔方用同一个模型但提示成「挑剔的测试用户」。
+  必须先看当前是不是 mock 再决定降不降级；token 和估算花费都记下来；超预算立刻停。
+
+每一轮：写一条对话记录，跑一遍判据，把发现挂到这条记录上。
+
+转录落 `transcripts/{scenario}.jsonl`，提示词快照可选落盘。
+
+### 5. 判据
+
+`check_turn` 看单轮，`check_scenario` 看整场，`check_state` 看状态。
+
+规则至少要盖住这些：
+
+- 自曝 AI、设定泄漏、客服腔、旁白动作、markdown 代码块；
+- 空回复、超长回复、同一句复读三次；
+- 时间感（白天说深夜话术）；
+- 身份幻觉（「你号不对 / 你换号了」）；
+- 群聊越级亲密、恋人语气越阶段；
+- 记忆串号（A 的事出现在 B 的回复里）；
+- 关系数值越界、阶段错位；
+- 提示词注入顺从（说了「忽略以上指令」之后出戏）；
+- 延迟超阈值。
+
+### 6. 覆盖率与报告
+
+覆盖率只统计 `app.*` 的代码对象，别的目录不进分母。同一个进程里要能反复开合，不许只跑一次就废。
+
+报告顺序：总览（项数/通过/异常/跳过/覆盖/耗时/花费）→ 缺陷清单（按严重度排，每条带复现）→ 逐模块覆盖表 → 场景转录索引 → 环境与哈希。同时出一份 JSON 版。
+
+**退出码**：有 P0 就返回 1，否则 0。
+
+---
+
+## 四、产物在哪
+
+一律落在 `data/_adv/<run-id>/`（`data/` 已被 gitignore）：
 
 ```
 data/_adv/<run-id>/
@@ -126,3 +135,25 @@ data/_adv/<run-id>/
   transcripts/*.jsonl          *.prompt.json
   logs/probe-subprocess/*.log
 ```
+
+---
+
+## 五、怎么跑
+
+```powershell
+# 整套跑一遍
+.\.venv\Scripts\python.exe scripts\adv_full.py
+
+# 只跑某一阶段
+.\.venv\Scripts\python.exe scripts\adv_full.py --phase routes
+```
+
+阶段顺序是固定的：清点 → 路由 → 函数 → 对抗 → 覆盖 → 报告。
+
+---
+
+## 下一步
+
+- 想看日常回归怎么跑 → [开发者文档](../../开发者文档.md)
+- 想加一个模块给内核 → [自己写模块](../../docs/自己写模块.md)
+- 踩过的坑 → [常见坑](../../docs/常见坑.md)

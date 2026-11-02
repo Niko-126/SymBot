@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-label="记忆怎么记、怎么淡、怎么钉">
+<rect width="900" height="420" fill="#F2F2EF"/>
+<text x="40" y="56" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="26" fill="#0B0C0E" font-weight="700" text-anchor="start">记忆怎么流动</text>
+<text x="40" y="84" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#9AA0A6" font-weight="400" text-anchor="start">记的是「事」，不是原话</text>
+<rect x="40" y="130" width="520" height="62" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="64" y="157" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="15" fill="#0B0C0E" font-weight="700" text-anchor="start">你随口说一件事</text>
+<text x="64" y="178" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">她记下来</text>
+<rect x="596" y="144" width="84" height="34" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="638" y="167" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">写入</text>
+<rect x="40" y="204" width="520" height="62" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="64" y="231" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="15" fill="#0B0C0E" font-weight="700" text-anchor="start">常提的</text>
+<text x="64" y="252" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">记得牢，越聊越清楚</text>
+<rect x="596" y="218" width="84" height="34" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="638" y="241" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">加温</text>
+<rect x="40" y="278" width="520" height="62" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="64" y="305" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="15" fill="#0B0C0E" font-weight="700" text-anchor="start">很久不提的</text>
+<text x="64" y="326" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">慢慢变淡，提一句能捞回</text>
+<rect x="596" y="292" width="84" height="34" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="638" y="315" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">衰减</text>
+<rect x="40" y="352" width="520" height="62" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="64" y="379" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="15" fill="#0B0C0E" font-weight="700" text-anchor="start">你钉住的</text>
+<text x="64" y="400" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">不参与淡忘，一直在</text>
+<rect x="596" y="366" width="84" height="34" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="638" y="389" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">钉住</text>
+<rect x="700" y="130" width="160" height="210" rx="14" ry="14" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="780" y="166" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">钉住的规则</text>
+<line x1="716" y1="180" x2="844" y2="180" stroke="#E4E4DE" stroke-width="1"/>
+<text x="780" y="208" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">别什么都钉</text>
+<text x="780" y="236" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">钉满等于没钉</text>
+<text x="780" y="264" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">她会分不出</text>
+<text x="780" y="292" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="middle">什么重要</text>
+<text x="40" y="392" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#9AA0A6" font-weight="400" text-anchor="start">想动手管理？面板的控制台里有记忆浏览：看得见、改得动、删得掉。</text>
+</svg>

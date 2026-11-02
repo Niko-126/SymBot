@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" role="img" aria-label="从下载到说上话">
+<rect width="900" height="300" fill="#F2F2EF"/>
+<text x="40" y="56" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="26" fill="#0B0C0E" font-weight="700" text-anchor="start">三步，最多十分钟</text>
+<text x="40" y="84" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#9AA0A6" font-weight="400" text-anchor="start">不用装 Python，不用敲命令</text>
+<rect x="40" y="116" width="264" height="128" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<circle cx="80" cy="156" r="18" fill="#00E0C6"/>
+<text x="80" y="162" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="15" fill="#0B0C0E" font-weight="700" text-anchor="middle">1</text>
+<text x="68" y="200" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="16" fill="#0B0C0E" font-weight="700" text-anchor="start">下载安装包</text>
+<text x="68" y="224" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">Core 137 MB / Standard 223 MB</text>
+<line x1="308" y1="180" x2="324" y2="180" stroke="#9AA0A6" stroke-width="2"/>
+<polygon points="324,180 315.8,183.7 315.8,176.3" fill="#9AA0A6"/>
+<rect x="328" y="116" width="264" height="128" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<circle cx="368" cy="156" r="18" fill="#00E0C6"/>
+<text x="368" y="162" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="15" fill="#0B0C0E" font-weight="700" text-anchor="middle">2</text>
+<text x="356" y="200" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="16" fill="#0B0C0E" font-weight="700" text-anchor="start">双击，下一步到底</text>
+<text x="356" y="224" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">装到当前用户目录，不写系统</text>
+<line x1="596" y1="180" x2="612" y2="180" stroke="#9AA0A6" stroke-width="2"/>
+<polygon points="612,180 603.8,183.7 603.8,176.3" fill="#9AA0A6"/>
+<rect x="616" y="116" width="264" height="128" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<circle cx="656" cy="156" r="18" fill="#00E0C6"/>
+<text x="656" y="162" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="15" fill="#0B0C0E" font-weight="700" text-anchor="middle">3</text>
+<text x="644" y="200" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="16" fill="#0B0C0E" font-weight="700" text-anchor="start">打开就说上话</text>
+<text x="644" y="224" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">没填 key 也能玩，默认离线试用</text>
+</svg>

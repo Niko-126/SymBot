@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" role="img" aria-label="SymBot 结构总览">
+<rect width="900" height="560" fill="#F2F2EF"/>
+<text x="40" y="56" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="26" fill="#0B0C0E" font-weight="700" text-anchor="start">她在你电脑里的位置</text>
+<text x="40" y="84" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#9AA0A6" font-weight="400" text-anchor="start">全部在本机，没有云端副本</text>
+<rect x="40" y="116" width="380" height="180" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="64" y="152" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="19" fill="#0B0C0E" font-weight="700" text-anchor="start">面板</text>
+<text x="64" y="178" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#9AA0A6" font-weight="400" text-anchor="start">浏览器里的五个页面</text>
+<rect x="64" y="200" width="108" height="30" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="118" y="220" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#0B0C0E" font-weight="400" text-anchor="middle">对话</text>
+<rect x="182" y="200" width="108" height="30" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="236" y="220" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#0B0C0E" font-weight="400" text-anchor="middle">控制台</text>
+<rect x="300" y="200" width="108" height="30" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="354" y="220" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#0B0C0E" font-weight="400" text-anchor="middle">设置</text>
+<rect x="64" y="238" width="108" height="30" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="118" y="258" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#0B0C0E" font-weight="400" text-anchor="middle">人设卡</text>
+<rect x="182" y="238" width="108" height="30" rx="8" ry="8" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="236" y="258" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#0B0C0E" font-weight="400" text-anchor="middle">热梗</text>
+<rect x="480" y="116" width="380" height="180" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="504" y="152" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="19" fill="#0B0C0E" font-weight="700" text-anchor="start">内核</text>
+<text x="504" y="178" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#9AA0A6" font-weight="400" text-anchor="start">记忆 / 关系 / 人格 / 作息</text>
+<rect x="504" y="196" width="332" height="78" rx="10" ry="10" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="524" y="224" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#0B0C0E" font-weight="700" text-anchor="start">记忆内核是闭源的</text>
+<text x="524" y="246" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">只给运行时和接口，能力可查、数据在你手里</text>
+<rect x="40" y="336" width="380" height="180" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="64" y="372" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="19" fill="#0B0C0E" font-weight="700" text-anchor="start">你的数据</text>
+<text x="64" y="398" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#9AA0A6" font-weight="400" text-anchor="start">安装目录下的 data/</text>
+<rect x="64" y="414" width="332" height="82" rx="10" ry="10" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="84" y="440" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">life.db    记忆 + 聊天 + 关系</text>
+<text x="84" y="462" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">stickers/  voices/  covers/</text>
+<text x="84" y="484" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">*.log      启动与服务日志</text>
+<rect x="480" y="336" width="380" height="180" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="504" y="372" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="19" fill="#0B0C0E" font-weight="700" text-anchor="start">外面的世界（可选）</text>
+<text x="504" y="398" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#9AA0A6" font-weight="400" text-anchor="start">不装也能用，装了才连</text>
+<rect x="504" y="414" width="158" height="82" rx="10" ry="10" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="583" y="444" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">NapCat</text>
+<text x="583" y="466" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="middle">QQ 通道</text>
+<rect x="680" y="414" width="156" height="82" rx="10" ry="10" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="758" y="444" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">模型 API</text>
+<text x="758" y="466" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="middle">OpenAI 兼容</text>
+<line x1="420" y1="206" x2="480" y2="206" stroke="#00E0C6" stroke-width="2"/>
+<polygon points="480,206 471.8,209.7 471.8,202.3" fill="#00E0C6"/>
+<line x1="420" y1="426" x2="480" y2="426" stroke="#9AA0A6" stroke-width="2"/>
+<polygon points="480,426 471.8,429.7 471.8,422.3" fill="#9AA0A6"/>
+<text x="450" y="196" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="10" fill="#0B0C0E" font-weight="400" text-anchor="start"></text>
+<text x="40" y="546" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="12" fill="#9AA0A6" font-weight="400" text-anchor="start">本地优先 · 单机单例 · 整个 data/ 拷走就是搬家</text>
+</svg>
