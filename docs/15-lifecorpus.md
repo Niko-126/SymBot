@@ -18,7 +18,7 @@
 
 | 文件 | 行数 | 一句话职责 |
 |---|---|---|
-| `app/lifecorpus/__init__.py` | 47 | 包入口：re-export 19 个对外符号 + `__version__ = "0.1.0"` |
+| `app/lifecorpus/__init__.py` | 47 | 包入口：re-export 19 个对外符号 + `__version__ = "0.2-P"` |
 | `app/lifecorpus/schema.py` | 508 | 四种语料的字段白名单、枚举、数值边界与逐字段校验（返回错误列表） |
 | `app/lifecorpus/pii.py` | 208 | 中国手机号 / 18 位身份证 / 邮箱的保守检测与遮掩 |
 | `app/lifecorpus/validate.py` | 365 | JSONL 读取、按文件名推断类型、逐行校验、目录汇总与文本渲染 |
@@ -450,7 +450,7 @@ scripts/corpus_*.py ──────┴→ app.lifecorpus.{schema,pii,validate
 
 ### 3.6 `app/lifecorpus/__init__.py`（47 行）
 
-**职责**：包入口。`__version__ = "0.1.0"`；`__all__` 列出 19 个符号：`KINDS`、`CoverageGap`、`CoverageReport`、`DirReport`、`FieldError`、`FileReport`、`Issue`、`PiiFinding`、`build_coverage`、`format_coverage`、`infer_kind`、`load_records`、`mask_object`、`mask_text`、`scan_and_mask`、`scan_object`、`scan_text`、`validate_dir`、`validate_file`、`validate_record`、`__version__`（`__all__` 里合计 21 项，含版本号）。
+**职责**：包入口。`__version__ = "0.2-P"`；`__all__` 列出 19 个符号：`KINDS`、`CoverageGap`、`CoverageReport`、`DirReport`、`FieldError`、`FileReport`、`Issue`、`PiiFinding`、`build_coverage`、`format_coverage`、`infer_kind`、`load_records`、`mask_object`、`mask_text`、`scan_and_mask`、`scan_object`、`scan_text`、`validate_dir`、`validate_file`、`validate_record`、`__version__`（`__all__` 里合计 21 项，含版本号）。
 
 注意**没有导出**的东西（要用来必须走子模块）：`fetch` 整个模块、`render_dir_report`、`field_spec`、`parse_hhmm`/`format_hhmm`/`snippet_turns`、`union_minutes`、`summarize`、`KIND_LABELS`、全部枚举常量。所以 `scripts/life_corpus.py` 是 `from app.lifecorpus.validate import DirReport, render_dir_report, validate_dir` 这样直接打子模块的。
 

@@ -1,7 +1,7 @@
 {
   "name": "symbot-desktop",
   "productName": "SymBot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "SymBot 衡忆 · Electron 桌面壳：拉起 Python 内核，窗口加载本地面板，关窗收进托盘",
   "main": "main.js",

@@ -143,7 +143,7 @@
 | `max_tokens` | `rt.cfg.provider.max_tokens` | 默认 400 |
 | `db` | `str(rt.cfg.db_file)` | `data/life.db` 绝对路径 |
 | `persona` | `rt.persona.name` | 当前人设名 |
-| `version` | `app.__version__` | `0.1.0` |
+| `version` | `app.__version__` | `0.2-P` |
 | `preflight` | `rt.preflight` | `{ok, base_url, model, force_model, warnings, checked_at}`，启动时算好，零网络 |
 | `channel` | `channel.as_dict()` | 当前能力位：`name/stickers/voice/images/group_proactive/private_proactive/max_reply_chars/can_split` |
 | `qq` | `qq_adapter.status()`，导入失败则 `{}` | `enabled/appid/sandbox/started/connected/events/last_event_at/last_reply_at/last_error` |

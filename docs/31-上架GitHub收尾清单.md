@@ -19,9 +19,9 @@
 | 功能自检 | adv **35/35** · smoke **387/0** · fullcheck **148/148 + 路由 127/127**（无表情库时 1 项 SKIP）· panel_check **143/0** |
 | 水印 | 130 文件已注入，`verify --scan app` → 130/130（密钥 `scripts/.wm.key` 不入库） |
 | 闭源记忆 | `app/memory/_vault.bin` 154,103 B（38 成员），删掉 vendor 源码仍可 remember/recall |
-| 桌面 | `desktop/dist/SymBot Setup 0.1.0.exe` 79,137,272 B，SHA256 `A44FD9A7…BE4693`，per-user |
+| 桌面 | `desktop/dist/SymBot Setup 0.2-P.exe` 79,137,272 B，SHA256 `A44FD9A7…BE4693`，per-user |
 
-**剩下只有一件**：owner 说"发布"→ `git remote add origin … && git push -u origin main` + 打 tag `v0.1.0`。
+**剩下只有一件**：owner 说"发布"→ `git remote add origin … && git push -u origin main` + 打 tag `v0.2-P`。
 
 ---
 
@@ -100,7 +100,7 @@ python scripts/panel_check.py    # 0 失败（通过数随功能增长，别拿�
 - [ ] `git add -A` 后**人工过一遍** `git diff --cached --stat`
 - [ ] 按 `HANDOFF.md` 第 7 节切分提交
 - [ ] `gh repo create` / `git remote add origin` + `git push -u origin main`
-- [ ] Release：打 tag `v0.1.0`，附 `SHA256SUMS.txt`、安装说明、许可声明
+- [ ] Release：打 tag `v0.2-P`，附 `SHA256SUMS.txt`、安装说明、许可声明
 - [ ] 关闭 Issues 里暴露隐私的旧内容
 
 ---
