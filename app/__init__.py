@@ -4,4 +4,4 @@
 ﻿​‍‍‍​‌‌​‌‌﻿‌​﻿﻿‍​﻿‍​‌‌‍﻿‌​​﻿​‍﻿﻿﻿"""
 
 __version__ = "0.1.0"
-__license__ = "SymBot Personal Use License 1.0 (source-available, not OSI open source)"
+__license__ = "SymBot Personal Use License 1.1 (source-available, not OSI open source)"

@@ -83,7 +83,7 @@ python scripts/panel_check.py    # 0 失败（通过数随功能增长，别拿�
 ## F. 文档
 
 - [ ] `README.md` 首屏有：一句话是什么、截图、30 秒上手、许可声明（个人免费/禁商用/记忆闭源）
-- [ ] `README.md` 明确写"不含第三方模型与素材，需自备"
+- [ ] `README.md` 写明"代码仓库不含第三方模型与素材；Standard/Full 分发包附带部分资源并按 `NOTICE.md` 声明权属"
 - [ ] `docs/README.md` 索引补齐新增文档（30/31/32…）
 - [ ] `HANDOFF.md`、`.tmp/`、`TASKS.md`（内部任务板）→ 发布前移除或移到私有仓库
 

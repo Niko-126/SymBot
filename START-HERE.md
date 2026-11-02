@@ -87,7 +87,7 @@ $env:SYMEM_MOCK="1"; $env:PYTHONIOENCODING="utf-8"; $env:PYTHONUTF8="1"
 
 ## 9. 许可证（**已定稿，2026-11-01**）
 
-**已确定：`SymBot 个人使用许可协议 1.0`**（`LICENSE`，自定义 source-available 许可，**不是** OSI 开源许可）。
+**已确定：`SymBot 个人使用许可协议 1.1`**（`LICENSE`，自定义 source-available 许可，**不是** OSI 开源许可）。
 
 | 用途 | 免费？ | 依据 |
 |---|---|---|

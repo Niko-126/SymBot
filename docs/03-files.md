@@ -395,7 +395,7 @@
 | `launcher.py` | 4 行：`python -m app.cli serve` 的最薄启动垫片 | 是 |
 | `ai-life.spec` | PyInstaller 打包描述（打包需用户开口，脚本 release.ps1） | 是 |
 | `README.md` | 项目门面 | 是 |
-| `LICENSE` | SymBot 个人使用许可协议 1.0（source-available，非 OSI 开源） | 是 |
+| `LICENSE` | SymBot 个人使用许可协议 1.1（source-available，非 OSI 开源） | 是 |
 | `START-HERE.md` | 新会话入口：铁律 + 开工顺序 | 是 |
 | `TASKS.md` | 任务板：现状快照、写域划分、并发编排、验收命令 | 是 |
 | `ROADMAP.md` | 改进方向与优先级（发布工程化 / 数据安全 / 可观测性…） | 是 |
