@@ -69,9 +69,9 @@ pypdf  reportlab  tiktoken  yt-dlp  python-dotenv  websockets
 
 ## 五、报告问题
 
-发现仓库不慎包含了第三方资产、或你的作品被未授权使用，请开 Issue 并附证据，
+发现仓库不慎包含了第三方资产、或你的作品被未授权使用，请开 Issue 或邮件 mendastudio@163.com 并附证据，
 作者会优先处理。
 
 ---
 
-Copyright (c) 2026 SymBot 项目作者. All rights reserved.
+Copyright (c) 2026 镜衡万象 · Symvolve. All rights reserved.

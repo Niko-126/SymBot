@@ -2,7 +2,7 @@
 
 为什么要它（2026-11-02 owner 提的）：
 之前的"主动"只会对聊过天的人开口，且没有任何"按指令去联系某个第三方"的入口。
-结果就是她能说出"我去跟霜小落说声晚安"，然后什么都没发生——这在真机上很假。
+结果就是她能说出"我去跟阿叔说声晚安"，然后什么都没发生——这在真机上很假。
 
 现在的分工：
 - `parse_contact()` 从用户话里抠出「联系谁 + 说什么 + 用什么口气」；
@@ -74,7 +74,7 @@ def tone_of(text: str) -> str:
 
 
 def parse_contact(text: str) -> dict[str, Any] | None:
-    """把"去跟霜小落说声晚安，语气直白点"拆成 {target, content, tone, raw}。
+    """把"去跟阿叔说声晚安，语气直白点"拆成 {target, content, tone, raw}。
 
     抠不出来就返回 None（让调用方按普通聊天处理）。
     """
@@ -156,7 +156,7 @@ def resolve_target(name: str) -> dict[str, Any] | None:
     for row in rows:
         if str(row["nickname"] or "").strip() == key:
             return {"uid": int(row["id"]), "openid": str(row["openid"]), "nickname": str(row["nickname"])}
-    for row in rows:  # 包含匹配（"霜小落" vs "霜小落（群里那个）"）
+    for row in rows:  # 包含匹配（"阿叔" vs "阿叔（群里那个）"）
         nick = str(row["nickname"] or "")
         if key and (key in nick or nick in key):
             return {"uid": int(row["id"]), "openid": str(row["openid"]), "nickname": nick}

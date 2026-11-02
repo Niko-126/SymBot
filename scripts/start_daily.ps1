@@ -10,7 +10,7 @@ param(
 )
 
 $ErrorActionPreference = 'Continue'
-if (-not $env:NAPCAT_DIR) { $env:NAPCAT_DIR = 'C:\AIGCProgram\OtherWork\NapCat-Shell' }
+if (-not $env:NAPCAT_DIR) { $env:NAPCAT_DIR = 'C:\path\to\NapCat-Shell' }
 $napcat = Join-Path $env:NAPCAT_DIR 'launcher.bat'
 $project = Split-Path -Parent $PSScriptRoot
 $python = Join-Path $project '.venv\Scripts\python.exe'

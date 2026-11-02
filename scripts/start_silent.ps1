@@ -10,7 +10,7 @@ param(
 
 $ErrorActionPreference = 'Continue'
 $root = Split-Path -Parent $PSScriptRoot
-if (-not $env:NAPCAT_DIR) { $env:NAPCAT_DIR = 'C:\AIGCProgram\OtherWork\NapCat-Shell' }
+if (-not $env:NAPCAT_DIR) { $env:NAPCAT_DIR = 'C:\path\to\NapCat-Shell' }
 $napcatDir = $env:NAPCAT_DIR
 $python = Join-Path $root '.venv\Scripts\python.exe'
 $logDir = Join-Path $root 'data\logs'

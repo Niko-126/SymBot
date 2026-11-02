@@ -6,7 +6,7 @@
 
 ## 0. 状态（2026-11-02 收尾完成，待 owner 拍板发布）
 
-发布版已生成在 `C:\AIGCProgram\GitHub\SymBot`（本地 commit `f417037`，**未 push / 未打 tag / 未发 release**）。
+发布版已生成在 `<发布目录>`（本地 commit `f417037`，**未 push / 未打 tag / 未发 release**）。
 
 | 项 | 结果 |
 |---|---|

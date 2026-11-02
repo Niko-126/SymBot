@@ -1,5 +1,7 @@
 # 21 · 脚本与运维（scripts）
 
+> 注：`scripts/live/*` 是开发仓里的真机对抗脚本，**发布包不含**；本章相关段落仅作方法记录。
+
 > 覆盖：`scripts/*.py`（31 个）+ `scripts/live/*.py`（11 个），共 42 个文件 / 14,598 行｜基于 2026-11-01 的代码状态（移除 R 级插件残留、新增语料出口后重扫）｜上游：docs/03（文件全表）、docs/16（`app/qa/` 底座）｜下游：docs/22（测试与验收）
 
 ## 1. 这一层干什么
@@ -187,7 +189,7 @@
 
 它做的事（逐行）：
 
-1. `REPO = pathlib.Path(r"C:\AIGCProgram\SymBot")`，`sys.path.insert` 后 `os.chdir(REPO)`——**绝对路径写死**，只能在这台机器上用。
+1. `REPO = pathlib.Path(r"<发布目录>")`，`sys.path.insert` 后 `os.chdir(REPO)`——**绝对路径写死**，只能在这台机器上用。
 2. `os.environ["SYMEM_ONEBOT_ENABLED"] = "0"`，注释：「关键：不碰 NapCat 那条线」。
 3. `os.environ["SYMEM_QQ_ENABLED"] = "1"`（走官方 botpy 通道）。
 4. `os.environ["PYTHONIOENCODING"] = "utf-8"`。

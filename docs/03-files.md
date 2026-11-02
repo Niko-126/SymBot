@@ -283,23 +283,10 @@
 | `scripts/test_lifecorpus.py` | 890 | 1 | 19 | life corpus 管线自测：不依赖 pytest，只用标准库，退出码 0 表示全过。 |
 | `scripts/verify_all.py` | 164 | 0 | 3 | 全功能自检总控：一条命令跑完所有自检，产出可复核的 Markdown 报告。 |
 
-### 3.2 `scripts/live/`
+### 3.2 `scripts/live/`（开发专用，发布包不含）
 
-**真机联调专用**：`serve_live.py` 起内核、`final_battery.py` 基础电池、`explicit_after_loosen.py` 露骨场景、`live_qq_*` 采集与驱动。→ docs/21
-
-| 文件 | 行数 | 类 | 函数 | 首行职责（模块 docstring 首句） |
-|---|---|---|---|---|
-| `scripts/live/explicit_after_loosen.py` | 75 | 0 | 3 | 松绑后的露骨场景验证（恋人已绑定、affinity 95、官方通道）。 |
-| `scripts/live/final_battery.py` | 165 | 0 | 7 | 最终真机全量回归（松绑 + 劝睡优化 + 多气泡兼容 + 通道能力位）。 |
-| `scripts/live/live_battery_http.py` | 240 | 0 | 7 | 真机全量电池 HTTP 直连版：不依赖 NapCat，直接驱动内核的 `/v1/console/send`。 |
-| `scripts/live/live_lexicon_cover.py` | 228 | 0 | 4 | 词库覆盖率测试：把词库塞进 prompt，量模型能激活多少。 |
-| `scripts/live/live_model_probe.py` | 195 | 0 | 6 | 模型对比探针：同一 prompt 换模型，看谁的直白度更高。 |
-| `scripts/live/live_prompt_probe.py` | 215 | 0 | 5 | Prompt 探针：不改源码，只验"许可与范本给足"之后的写法差异。 |
-| `scripts/live/live_qq_campaign.py` | 293 | 0 | 8 | 真机全量对抗战役（123456789 × 官方 bot 666777888）。 |
-| `scripts/live/live_qq_capture.py` | 127 | 0 | 4 | 真机聊天采集器：轮询真实 events 表，把每一条 QQ 消息连同她的回复、meta、状态一起落盘。 |
-| `scripts/live/live_qq_duel.py` | 194 | 0 | 5 | 真机对抗驱动：用 NapCat（123456789 星辰）当“用户”，官方 bot「屑鲸鱼」当“她”。 |
-| `scripts/live/live_qq_ping.py` | 68 | 1 | 1 | 真机主动消息探针：用官方 bot 主动给「阿星」私聊 + 群 555666777 各发一条。 |
-| `scripts/live/serve_live.py` | 43 | 0 | 0 | 真机测试专用内核启动器（不进仓库、不改用户配置）。 |
+真机对抗/采集/探针脚本只在开发仓保留：它们会真的往 QQ 发消息、依赖本机 NapCat 与私人号，
+不适合随发布包分发。需要时见开发仓 `scripts/live/`，用法见 docs/21。
 
 ## 4. vendor/ 只读引擎
 
