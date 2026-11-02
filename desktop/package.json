@@ -16,7 +16,6 @@
     "electron": "^31.7.7",
     "electron-builder": "^24.13.3"
   },
-
   "build": {
     "appId": "com.symbot.desktop",
     "productName": "SymBot",
@@ -48,6 +47,15 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "shortcutName": "SymBot 衡忆"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   }
 }

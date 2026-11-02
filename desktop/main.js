@@ -74,15 +74,41 @@ function openKernelLog() {
   return kernelLogFd
 }
 
-// 解释器优先级：仓库 venv → SYMBOT_PYTHON → PATH 里的 python
-function resolvePython() {
+// 内核怎么起：
+// - 安装版（Electron 打包后）：用随包带的无控制台内核 resources/kernel/SymBotKernel.exe
+// - 开发版：仓库 venv → SYMBOT_PYTHON → PATH 里的 python（-m app.cli serve）
+function resolveKernel() {
+  if (app.isPackaged) {
+    const exe = path.join(process.resourcesPath, 'resources', 'kernel', 'SymBotKernel.exe')
+    if (fs.existsSync(exe)) {
+      return { cmd: exe, args: [String(PORT)], cwd: path.dirname(app.getPath('exe')) }
+    }
+    logLine(`安装包里没找到内核：${exe}，回退到系统 python`)
+  }
   const root = repoRoot()
   const venv = process.platform === 'win32'
     ? path.join(root, '.venv', 'Scripts', 'python.exe')
     : path.join(root, '.venv', 'bin', 'python')
-  if (fs.existsSync(venv)) return venv
-  if (process.env.SYMBOT_PYTHON) return process.env.SYMBOT_PYTHON
-  return process.platform === 'win32' ? 'python' : 'python3'
+  let python = process.env.SYMBOT_PYTHON
+  if (!python && fs.existsSync(venv)) python = venv
+  if (!python) python = process.platform === 'win32' ? 'python' : 'python3'
+  return { cmd: python, args: ['-m', 'app.cli', 'serve', '--port', String(PORT)], cwd: root }
+}
+
+// 标准版安装包会把素材放在 resources/assets_seed，首次运行释放到安装目录 data/
+function seedAssets() {
+  if (!app.isPackaged) return
+  const seed = path.join(process.resourcesPath, 'resources', 'assets_seed')
+  if (!fs.existsSync(seed)) return
+  const target = path.join(path.dirname(app.getPath('exe')), 'data')
+  try {
+    if (fs.existsSync(target) && fs.readdirSync(target).length > 0) return
+    fs.mkdirSync(target, { recursive: true })
+    fs.cpSync(seed, target, { recursive: true })
+    logLine(`素材已释放到 ${target}`)
+  } catch (err) {
+    logLine(`素材释放失败（不影响启动）：${err.message}`)
+  }
 }
 
 // ---------------------------------------------------------------- 内核探测 / 拉起
@@ -121,17 +147,24 @@ function probeHealth(timeoutMs = 1500) {
 }
 
 function spawnKernel() {
-  const python = resolvePython()
-  const root = repoRoot()
+  const k = resolveKernel()
   const fd = openKernelLog()
   const stdio = fd === null ? 'ignore' : ['ignore', fd, fd]
-  logLine(`启动内核：${python} -m app.cli serve --port ${PORT}（cwd=${root}）`)
+  logLine(`启动内核：${k.cmd} ${k.args.join(' ')}（cwd=${k.cwd}）`)
   let child
+  // SYMEM_DATA 是数据根（内核会再拼 data/ 前缀），所以指到 exe 所在目录
+  const appDir = path.dirname(app.getPath('exe'))
   try {
-    child = spawn(python, ['-m', 'app.cli', 'serve', '--port', String(PORT)], {
-      cwd: root,
+    fs.mkdirSync(path.join(appDir, 'data'), { recursive: true })
+  } catch {
+    /* 目录建不了就交给内核自己处理 */
+  }
+  try {
+    child = spawn(k.cmd, k.args, {
+      cwd: k.cwd,
       windowsHide: true,
       stdio,
+      env: { ...process.env, SYMEM_DATA: appDir, PYTHONUTF8: '1' },
     })
   } catch (err) {
     logLine(`内核启动失败：${err.message}`)
@@ -205,7 +238,7 @@ async function boot() {
   logLine('内核对齐失败，弹窗提示')
   const detail = [
     `端口：${PORT}`,
-    `解释器：${resolvePython()}`,
+    `内核：${resolveKernel().cmd}`,
     `仓库：${repoRoot()}`,
     `日志：${logPath()}`,
   ].join('\n')
@@ -365,7 +398,7 @@ function registerIpc() {
       port: PORT,
       url: APP_URL,
       owned: Boolean(kernel),
-      python: resolvePython(),
+      kernel: resolveKernel().cmd,
       logPath: logPath(),
       detail: probe.data || null,
       error: probe.error || null,
@@ -403,6 +436,7 @@ if (!app.requestSingleInstanceLock()) {
 
   app.whenReady().then(async () => {
     app.setAppUserModelId('com.symbot.desktop')
+    seedAssets()
     registerIpc()
     const result = await boot()
     if (!result.ok) {

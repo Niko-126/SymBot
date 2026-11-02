@@ -40,3 +40,8 @@ build/vendor-memory/
 !app/memory/_vault.bin
 
 scripts/.wm.key
+
+# Electron 打包中间产物（内核 exe / 素材 seed 很大，不入库）
+desktop/resources/
+desktop/dist/
+desktop/node_modules/
