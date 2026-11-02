@@ -4,6 +4,25 @@
 
 ---
 
+## 0. 状态（2026-11-02 收尾完成，待 owner 拍板发布）
+
+发布版已生成在 `C:\AIGCProgram\GitHub\SymBot`（本地 commit `f417037`，**未 push / 未打 tag / 未发 release**）。
+
+| 项 | 结果 |
+|---|---|
+| 仓库卫生 | 5.08 MB / 277 文件；无 `data/`、`.venv/`、`vendor/`、`life.db`、`config.local.yaml`、`.wm.key` |
+| 隐私 | 真实 QQ/群号/api_key 在入库文件里 **0 命中**（`HANDOFF.md`、`TASKS.md`、`scripts/live/` 已排除） |
+| 第三方 | 无 NapCat/CosyVoice/RVC/表情包/权重；`NOTICE.md` + `LICENSE` 在根目录 |
+| 安装 | `environment: test` 默认：独立库 `data/test-life.db`、mock、OneBot/语音/热梗关闭；clone 即跑 |
+| 功能自检 | adv **35/35** · smoke **387/0** · fullcheck **148/148 + 路由 127/127**（无表情库时 1 项 SKIP）· panel_check **143/0** |
+| 水印 | 130 文件已注入，`verify --scan app` → 130/130（密钥 `scripts/.wm.key` 不入库） |
+| 闭源记忆 | `app/memory/_vault.bin` 154,103 B（38 成员），删掉 vendor 源码仍可 remember/recall |
+| 桌面 | `desktop/dist/SymBot Setup 0.1.0.exe` 79,137,272 B，SHA256 `A44FD9A7…BE4693`，per-user |
+
+**剩下只有一件**：owner 说"发布"→ `git remote add origin … && git push -u origin main` + 打 tag `v0.1.0`。
+
+---
+
 ## A. 仓库卫生（红线）
 
 - [ ] 删除仓库根目录游荡的 `life.db`（未跟踪，含真实聊天）
