@@ -1,0 +1,2428 @@
+<!doctype html>
+<html lang="zh-CN" data-symvolve-scaffold="settings">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>设置 · 小鲸 · 衡忆</title>
+  <link rel="stylesheet" href="./symvolve-tokens.css">
+<link rel="stylesheet" href="./symvolve.css">
+  <script src="./symvolve-components.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      background: var(--sv-surface-canvas);
+      color: var(--sv-text-primary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-body-m);
+      line-height: var(--sv-leading-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    [hidden] { display: none !important; }
+    h1, h2, h3, p, ul, figure { margin: 0; }
+    button, input, select { font: inherit; }
+    a { color: var(--sv-text-primary); text-decoration: underline; text-underline-offset: var(--sv-border-width-strong); }
+    a:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+    ::selection { background: var(--sv-selection-background); color: var(--sv-selection-text); }
+    .mono { font-family: var(--sv-font-mono); font-variant-numeric: tabular-nums; letter-spacing: var(--sv-tracking-codename); }
+
+    .shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--sv-space-32) var(--sv-space-32) var(--sv-space-64);
+    }
+
+    /* ---------- 顶栏 ---------- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sv-space-16);
+      padding-bottom: var(--sv-space-16);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+    }
+    .brand { display: flex; align-items: center; gap: var(--sv-space-8); }
+    .whale-mark {
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: var(--sv-radius-full);
+      object-fit: cover;
+      border: 1px solid var(--sv-border-divider);
+    }
+    .mark {
+      width: var(--sv-space-16);
+      height: var(--sv-space-16);
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 7;
+      stroke-linecap: butt;
+      stroke-linejoin: miter;
+    }
+    .brand-zh { font-size: var(--sv-text-body-m); font-weight: var(--sv-weight-medium); }
+    .brand-en { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); letter-spacing: var(--sv-tracking-codename); }
+
+    /* ---------- 页头 ---------- */
+    .page-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--sv-space-16);
+      margin: var(--sv-space-32) 0 var(--sv-space-24);
+    }
+    .page-title {
+      font-size: var(--sv-text-heading-l);
+      font-weight: var(--sv-weight-medium);
+      line-height: var(--sv-leading-heading);
+      letter-spacing: var(--sv-tracking-display);
+    }
+    .page-sub { margin-top: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    /* ---------- 页签 ---------- */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sv-space-24);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+    }
+    .tab {
+      appearance: none;
+      margin-bottom: calc(var(--sv-border-width-thin) * -1);
+      padding: var(--sv-space-8) 0 var(--sv-space-12);
+      border: 0;
+      border-bottom: var(--sv-border-width-strong) solid transparent;
+      background: transparent;
+      color: var(--sv-text-secondary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-caption);
+      cursor: pointer;
+    }
+    .tab:hover { color: var(--sv-text-primary); }
+    .tab:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+    .tab.on { color: var(--sv-text-primary); font-weight: var(--sv-weight-medium); border-bottom-color: var(--sv-accent-signal); }
+    .panel { padding-top: var(--sv-space-24); }
+
+    /* ---------- 通用文本 ---------- */
+    .hint, .meta { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .hint { margin-top: var(--sv-space-8); }
+    .status {
+      margin-top: var(--sv-space-8);
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+    }
+    .status.err {
+      padding-left: var(--sv-space-8);
+      border-left: var(--sv-border-width-strong) solid var(--sv-border-strong);
+      color: var(--sv-text-primary);
+    }
+    .sec {
+      margin: var(--sv-space-32) 0 var(--sv-space-12);
+      padding-top: var(--sv-space-16);
+      border-top: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      font-size: var(--sv-text-caption);
+      font-weight: var(--sv-weight-medium);
+    }
+
+    /* ---------- 控件 ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--sv-space-32);
+      padding: 0 var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-sm);
+      background: transparent;
+      color: var(--sv-text-primary);
+      font-size: var(--sv-text-caption);
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--sv-surface-sunken); border-color: var(--sv-border-strong); }
+    .btn:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+    .btn:disabled { background: var(--sv-disabled-surface); border-color: var(--sv-disabled-border); color: var(--sv-disabled-text); cursor: not-allowed; }
+    .btn--sm { height: var(--sv-space-24); padding: 0 var(--sv-space-8); font-size: var(--sv-text-micro); }
+    a.btn { text-decoration: none; }
+    .row { display: flex; flex-wrap: wrap; gap: var(--sv-space-8); }
+
+    input[type="text"], input[type="search"], input[type="number"], select {
+      height: var(--sv-space-32);
+      padding: 0 var(--sv-space-8);
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-surface-canvas);
+      color: var(--sv-text-primary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-caption);
+    }
+    input[type="text"]:hover, input[type="search"]:hover, input[type="number"]:hover, select:hover { border-color: var(--sv-border-strong); }
+    input[type="text"]:focus-visible, input[type="search"]:focus-visible, input[type="number"]:focus-visible, select:focus-visible {
+      border-color: var(--sv-border-strong);
+      outline: var(--sv-border-width-strong) solid var(--sv-focus-ring);
+      outline-offset: var(--sv-border-width-strong);
+    }
+    input::placeholder { color: var(--sv-text-secondary); }
+    input[type="file"] { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    .filter-row, .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: var(--sv-space-12);
+      margin-top: var(--sv-space-12);
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sv-space-4);
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+    }
+    .field.grow { flex: 1; min-width: var(--sv-space-96); }
+    .field input, .field select { min-width: 0; }
+
+    /* ---------- 连接与账号卡片 ---------- */
+    .card {
+      margin-top: var(--sv-space-8);
+      padding: var(--sv-space-24);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-lg);
+      background: var(--sv-surface-raised);
+    }
+    .card-head { display: flex; flex-direction: column; gap: var(--sv-space-4); }
+    .card-title { font-size: var(--sv-text-caption); font-weight: var(--sv-weight-medium); }
+    .card-note { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .card .sec:first-of-type { margin-top: var(--sv-space-16); padding-top: 0; border-top: 0; }
+    .card input[type="password"] {
+      height: var(--sv-space-32);
+      padding: 0 var(--sv-space-8);
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-surface-canvas);
+      color: var(--sv-text-primary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-caption);
+    }
+    .card input[type="password"]:focus-visible {
+      border-color: var(--sv-border-strong);
+      outline: var(--sv-border-width-strong) solid var(--sv-focus-ring);
+      outline-offset: var(--sv-border-width-strong);
+    }
+    .family-list { display: flex; flex-direction: column; gap: var(--sv-space-8); margin-top: var(--sv-space-12); }
+    .family-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1.2fr) auto;
+      gap: var(--sv-space-8);
+      align-items: center;
+    }
+    .family-row input, .family-row select { width: 100%; min-width: 0; }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sv-space-8);
+      margin-top: var(--sv-space-12);
+      font-size: var(--sv-text-caption);
+    }
+    .card-actions {
+      margin-top: var(--sv-space-24);
+      padding-top: var(--sv-space-16);
+      border-top: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+    }
+    @media (max-width: 640px) {
+      .family-row { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    /* 开关 */
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sv-space-16);
+      padding: var(--sv-space-12) 0;
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+    }
+    .switch-label { font-size: var(--sv-text-caption); }
+    .switch {
+      position: relative;
+      width: var(--sv-space-48);
+      height: var(--sv-space-24);
+      flex: none;
+      padding: 0;
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-full);
+      background: transparent;
+      cursor: pointer;
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: var(--sv-radius-full);
+      background: var(--sv-border-divider);
+      transition: transform var(--sv-duration-state) var(--sv-ease-standard);
+    }
+    .switch[aria-checked="true"] { border-color: var(--sv-border-strong); }
+    .switch[aria-checked="true"]::after { background: var(--sv-text-primary); transform: translateX(var(--sv-space-24)); }
+    .switch:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+
+    /* ---------- 人物 ---------- */
+    .persona-head { display: grid; gap: var(--sv-space-4); }
+    .persona-name { font-size: var(--sv-text-heading-m); font-weight: var(--sv-weight-medium); line-height: var(--sv-leading-heading); }
+    .persona-tagline { font-size: var(--sv-text-caption); color: var(--sv-text-secondary); }
+    .persona-meta { display: flex; align-items: baseline; gap: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .dot { color: var(--sv-text-muted); }
+
+    .traits { display: grid; gap: var(--sv-space-16); }
+    .trait-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sv-space-12); }
+    .trait-name { font-size: var(--sv-text-caption); }
+    .trait-num { display: flex; align-items: baseline; gap: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .trait-num b { font-family: var(--sv-font-mono); font-size: var(--sv-text-caption); font-weight: var(--sv-weight-regular); color: var(--sv-text-primary); }
+    .trait input[type="range"] {
+      width: 100%;
+      height: var(--sv-space-16);
+      margin: var(--sv-space-4) 0 0;
+      padding: 0;
+      background: transparent;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .trait input[type="range"]::-webkit-slider-runnable-track { height: var(--sv-border-width-strong); background: var(--sv-border-control); }
+    .trait input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: var(--sv-space-12);
+      height: var(--sv-space-12);
+      margin-top: calc((var(--sv-space-12) - var(--sv-border-width-strong)) * -0.5);
+      border: 0;
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-text-primary);
+    }
+    .trait input[type="range"]::-moz-range-track { height: var(--sv-border-width-strong); background: var(--sv-border-control); }
+    .trait input[type="range"]::-moz-range-thumb {
+      width: var(--sv-space-12);
+      height: var(--sv-space-12);
+      border: 0;
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-text-primary);
+    }
+    .trait input[type="range"]:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+
+    .quiet-list { list-style: none; padding: 0; }
+    .quiet-list li {
+      padding: var(--sv-space-8) 0;
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      font-size: var(--sv-text-caption);
+    }
+    .quiet-list li:last-child { border-bottom: 0; }
+
+    /* ---------- 表格 ---------- */
+    .table-wrap { overflow-x: auto; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: var(--sv-text-caption); }
+    .tbl th {
+      padding: var(--sv-space-8) var(--sv-space-12);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      background: var(--sv-surface-sunken);
+      color: var(--sv-text-secondary);
+      font-weight: var(--sv-weight-regular);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .tbl td {
+      padding: var(--sv-space-8) var(--sv-space-12);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      vertical-align: top;
+    }
+    .tbl td.mono { font-size: var(--sv-text-micro); }
+    .tbl tr:last-child td { border-bottom: 0; }
+
+    /* ---------- 关系 ---------- */
+    .stage-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--sv-space-12); }
+    .stage-name { font-size: var(--sv-text-body-l); font-weight: var(--sv-weight-medium); }
+    .bars { display: grid; gap: var(--sv-space-16); margin-top: var(--sv-space-16); }
+    .bar-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sv-space-8); font-size: var(--sv-text-caption); }
+    .bar-head b { font-family: var(--sv-font-mono); font-weight: var(--sv-weight-regular); }
+    .bar { height: var(--sv-border-width-strong); margin-top: var(--sv-space-8); background: var(--sv-border-hairline); }
+    .bar i { display: block; width: 0; height: 100%; background: var(--sv-accent-signal); }
+    .rel-foot { margin-top: var(--sv-space-16); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .rel-foot b { color: var(--sv-text-primary); font-weight: var(--sv-weight-regular); }
+
+    .log-list { list-style: none; padding: 0; margin-top: var(--sv-space-8); }
+    .log-item { padding: var(--sv-space-8) 0; border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline); }
+    .log-item:last-child { border-bottom: 0; }
+    .log-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sv-space-12); }
+    .log-ts { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .log-delta { font-size: var(--sv-text-micro); }
+    .log-reason { margin-top: var(--sv-space-4); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .log-trigger { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    /* ---------- 记忆 ---------- */
+    .mem-list { display: grid; gap: var(--sv-space-12); margin-top: var(--sv-space-12); }
+    .mem-item { padding: var(--sv-space-12); border: var(--sv-border-width-thin) solid var(--sv-border-hairline); border-radius: var(--sv-radius-sm); }
+    .mem-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--sv-space-8); }
+    /* 归属分组头：全部模式下按人切开，别让不同人的记忆糊成一锅 */
+    .mem-group {
+      display: flex; align-items: baseline; gap: var(--sv-space-8);
+      margin: var(--sv-space-16) 0 0; padding-bottom: var(--sv-space-4);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      font-size: var(--sv-text-small); font-weight: 600;
+    }
+    .mem-group .mono { color: var(--sv-text-secondary); font-weight: 400; }
+    .mem-owner { font-size: var(--sv-text-micro); color: var(--sv-accent); }
+    .log-owner { font-size: var(--sv-text-micro); color: var(--sv-accent); }
+    .mem-kind {
+      padding: 0 var(--sv-space-4);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-sm);
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+    }
+    .mem-imp { margin-left: auto; font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .mem-pin {
+      padding: 0 var(--sv-space-4);
+      border: var(--sv-border-width-thin) solid var(--sv-border-strong);
+      border-radius: var(--sv-radius-sm);
+      font-size: var(--sv-text-micro);
+    }
+    .mem-text { margin-top: var(--sv-space-8); font-size: var(--sv-text-caption); overflow-wrap: anywhere; }
+    .mem-actions { display: flex; flex-wrap: wrap; gap: var(--sv-space-8); margin-top: var(--sv-space-8); }
+
+    .recall { margin-top: var(--sv-space-12); display: grid; gap: var(--sv-space-12); }
+    .recall-block { padding-top: var(--sv-space-8); border-top: var(--sv-border-width-thin) solid var(--sv-border-hairline); }
+    .recall-title { margin-bottom: var(--sv-space-4); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    /* ---------- 日程 / 模型 ---------- */
+    .kv-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sv-space-8) var(--sv-space-24); margin-top: var(--sv-space-12); }
+    .kv-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--sv-space-12);
+      padding: var(--sv-space-4) 0;
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      font-size: var(--sv-text-caption);
+    }
+    .kv-row .k { flex: none; max-width: 55%; font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .kv-row .v { text-align: right; overflow-wrap: anywhere; }
+
+    .style-list { display: grid; gap: var(--sv-space-8); margin-top: var(--sv-space-12); }
+    .style-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sv-space-8);
+      padding: var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-sm);
+      cursor: pointer;
+    }
+    .style-item.on { border-color: var(--sv-border-strong); }
+    .style-item input { margin-top: var(--sv-space-4); accent-color: var(--sv-focus-ring); }
+    .style-text { display: grid; gap: var(--sv-space-4); }
+    .style-name { font-size: var(--sv-text-caption); }
+    .style-note { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    .totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sv-space-8); margin-top: var(--sv-space-12); }
+    .total { padding: var(--sv-space-8) var(--sv-space-12); border: var(--sv-border-width-thin) solid var(--sv-border-hairline); border-radius: var(--sv-radius-sm); }
+    .total span { display: block; margin-bottom: var(--sv-space-4); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .total b { font-family: var(--sv-font-mono); font-size: var(--sv-text-caption); font-weight: var(--sv-weight-regular); }
+
+    /* ---------- 灵魂 ---------- */
+    .out { display: grid; gap: var(--sv-space-4); margin-top: var(--sv-space-8); }
+    .out .mono { font-size: var(--sv-text-micro); overflow-wrap: anywhere; }
+    .snap-list { display: grid; gap: var(--sv-space-8); margin-top: var(--sv-space-12); }
+    .snap-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sv-space-12);
+      padding: var(--sv-space-8) var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-sm);
+    }
+    .snap-name { font-size: var(--sv-text-caption); overflow-wrap: anywhere; }
+    .snap-meta { display: block; margin-top: var(--sv-space-4); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    .foot {
+      margin-top: var(--sv-space-64);
+      padding-top: var(--sv-space-16);
+      border-top: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+    }
+
+    @media (max-width: 700px) {
+      .shell { padding: var(--sv-space-24) var(--sv-space-16) var(--sv-space-48); }
+      .tabs { gap: var(--sv-space-16); }
+      .page-title { font-size: var(--sv-text-heading-m); }
+      .kv-grid, .totals { grid-template-columns: minmax(0, 1fr); }
+      .filter-row .btn, .form-row .btn { align-self: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  
+      /* 签名动效：信号扫描线（只在工具/声音卡片标题上，用一次） */
+      .sv-scan {
+        position: relative; display: inline-block; width: 64px; height: 2px;
+        margin-left: 10px; vertical-align: middle; border-radius: 999px;
+        background: linear-gradient(90deg, transparent, var(--sv-color-signal, #00E0C6), transparent);
+        opacity: .55; overflow: hidden;
+      }
+      .sv-scan::after {
+        content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent);
+        animation: svScan 2.6s cubic-bezier(.22,.61,.36,1) infinite;
+      }
+      @keyframes svScan {
+        0% { transform: translateX(-100%); }
+        62%, 100% { transform: translateX(100%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .sv-scan::after { animation: none; opacity: 0; }
+      }
+      html.sv-static .sv-scan::after { animation: none; opacity: 0; }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <img class="whale-mark" src="./assets/whale-logo-64.png" alt="小鲸" width="22" height="22">
+        <span class="brand-zh">小鲸</span>
+        <span class="mono brand-en">symvolve</span>
+      </div>
+      <a class="back" href="/">返回对话</a>
+    </header>
+
+    <main>
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">设置</h1>
+          <p class="page-sub">小涵 · 人物与运行配置</p>
+        </div>
+        <div class="row">
+          <a class="btn btn--sm" href="./persona.html">人设卡编辑</a>
+          <button type="button" class="btn btn--sm" id="reloadTab">重新加载</button>
+        </div>
+      </div>
+
+      <nav class="tabs" role="tablist" aria-label="设置分类">
+        <button type="button" class="tab on" id="tab-persona" role="tab" data-tab="persona" aria-selected="true" aria-controls="panel-persona">人物</button>
+        <button type="button" class="tab" id="tab-relation" role="tab" data-tab="relation" aria-selected="false" aria-controls="panel-relation">关系</button>
+        <button type="button" class="tab" id="tab-memory" role="tab" data-tab="memory" aria-selected="false" aria-controls="panel-memory">记忆</button>
+        <button type="button" class="tab" id="tab-schedule" role="tab" data-tab="schedule" aria-selected="false" aria-controls="panel-schedule">日程</button>
+        <button type="button" class="tab" id="tab-models" role="tab" data-tab="models" aria-selected="false" aria-controls="panel-models">模型</button>
+        <button type="button" class="tab" id="tab-soul" role="tab" data-tab="soul" aria-selected="false" aria-controls="panel-soul">灵魂</button>
+        <button type="button" class="tab" id="tab-tools" role="tab" data-tab="tools" aria-selected="false" aria-controls="panel-tools">工具</button>
+        <button type="button" class="tab" id="tab-account" role="tab" data-tab="account" aria-selected="false" aria-controls="panel-account">连接</button>
+      </nav>
+
+      <!-- 1 人物 -->
+      <section class="panel" id="panel-persona" role="tabpanel" aria-labelledby="tab-persona" data-panel="persona">
+        <p class="status" id="personaStatus" role="status" hidden></p>
+        <div class="persona-head">
+          <h2 class="persona-name" id="personaName">—</h2>
+          <p class="persona-tagline" id="personaTagline">—</p>
+          <p class="persona-meta">
+            <span id="personaAge">—</span>
+            <span class="dot" aria-hidden="true">·</span>
+            <span id="personaSpecies">—</span>
+          </p>
+        </div>
+
+        <h3 class="sec">人格维度</h3>
+        <div class="traits" id="traits"></div>
+        <p class="hint">拖动滑杆，松手后自动保存。</p>
+
+        <h3 class="sec">她的原话</h3>
+        <ul class="quiet-list" id="quotes"></ul>
+
+        <h3 class="sec">反向锚点</h3>
+        <ul class="quiet-list" id="negatives"></ul>
+
+        <h3 class="sec">关系阶段表</h3>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>阶段</th><th>门槛</th><th>称呼</th></tr></thead>
+            <tbody id="personaStage"></tbody>
+          </table>
+        </div>
+
+        <h3 class="sec">她的一天</h3>
+        <div class="filter-row">
+          <button type="button" class="btn" id="diaryWrite">补写昨天的日记</button>
+          <button type="button" class="btn" id="diaryReload">刷新</button>
+        </div>
+        <p class="status" id="diaryStatus" role="status" hidden></p>
+        <ul class="quiet-list" id="diaryList"></ul>
+      </section>
+
+      <!-- 2 关系 -->
+      <section class="panel" id="panel-relation" role="tabpanel" aria-labelledby="tab-relation" data-panel="relation" hidden>
+        <p class="status" id="relationStatus" role="status" hidden></p>
+        <div class="stage-line">
+          <span class="stage-name" id="relStage">—</span>
+          <span class="meta">称呼 <b id="relCall">—</b></span>
+        </div>
+        <div class="bars" id="relBars"></div>
+        <p class="rel-foot">厌恶 <b class="mono" id="relAversion">—</b></p>
+
+        <h3 class="sec">阶段表</h3>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>阶段</th><th>门槛</th><th>称呼</th></tr></thead>
+            <tbody id="relationStage"></tbody>
+          </table>
+        </div>
+
+        <h3 class="sec">事件流水</h3>
+        <p class="status" id="logStatus" role="status" hidden></p>
+        <ul class="log-list" id="relLog"></ul>
+
+        <h3 class="sec">手动校准</h3>
+        <p class="hint">只在开发者开关打开时可用。</p>
+        <form class="form-row" id="calForm">
+          <label class="field">好感 affinity <input type="number" id="calAffinity" min="0" max="100" step="1" inputmode="numeric"></label>
+          <label class="field">信任 trust <input type="number" id="calTrust" min="0" max="100" step="1" inputmode="numeric"></label>
+          <label class="field">心动 attraction <input type="number" id="calAttraction" min="0" max="100" step="1" inputmode="numeric"></label>
+          <button type="submit" class="btn">校准</button>
+        </form>
+        <p class="status" id="calStatus" role="status" hidden></p>
+      </section>
+
+      <!-- 3 记忆 -->
+      <section class="panel" id="panel-memory" role="tabpanel" aria-labelledby="tab-memory" data-panel="memory" hidden>
+        <p class="status" id="memStatus" role="status" hidden></p>
+        <div class="filter-row">
+          <label class="field">归属
+            <select id="memOwner">
+              <option value="">全部（按人分组）</option>
+            </select>
+          </label>
+          <label class="field">类别
+            <select id="memKind">
+              <option value="">全部</option>
+              <option value="fact">事实</option>
+              <option value="boundary">雷点</option>
+              <option value="preference">偏好</option>
+              <option value="event">事件</option>
+              <option value="diary">日记</option>
+            </select>
+          </label>
+          <label class="field grow">关键字 <input type="search" id="memQ" placeholder="输入关键词" autocomplete="off"></label>
+          <button type="button" class="btn" id="memSearch">查询</button>
+        </div>
+
+        <div class="mem-list" id="memList"></div>
+
+        <h3 class="sec">召回测试</h3>
+        <div class="filter-row">
+          <label class="field grow">一句话 <input type="text" id="recallQ" placeholder="例如：我最近睡不好" autocomplete="off"></label>
+          <button type="button" class="btn" id="recallBtn">召回</button>
+        </div>
+        <p class="status" id="recallStatus" role="status" hidden></p>
+        <div class="recall" id="recallOut"></div>
+      </section>
+
+      <!-- 4 日程 -->
+      <section class="panel" id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" data-panel="schedule" hidden>
+        <p class="status" id="schedStatus" role="status" hidden></p>
+        <div class="kv-grid">
+          <div class="kv-row"><span class="k">现在时间</span><span class="v mono" id="nowTime">—</span></div>
+          <div class="kv-row"><span class="k">在做什么</span><span class="v" id="nowActivity">—</span></div>
+          <div class="kv-row"><span class="k">精力</span><span class="v mono" id="nowEnergy">—</span></div>
+          <div class="kv-row"><span class="k">是否睡着</span><span class="v" id="nowSleep">—</span></div>
+        </div>
+
+        <h3 class="sec">作息表</h3>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>开始</th><th>活动</th><th>精力</th><th>睡着</th></tr></thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+
+        <h3 class="sec">主动消息</h3>
+        <div class="switch-row">
+          <div>
+            <span class="switch-label">开启</span>
+            <p class="hint">关闭后她不会主动开口。</p>
+          </div>
+          <button type="button" class="switch" id="proEnabled" role="switch" aria-checked="false" aria-label="主动消息开关"></button>
+        </div>
+        <form class="form-row" id="proForm">
+          <label class="field">冷却分钟 <input type="number" id="proCooldown" min="1" max="240" step="1" inputmode="numeric"></label>
+          <label class="field">每日上限 <input type="number" id="proDaily" min="0" step="1" inputmode="numeric"></label>
+          <button type="submit" class="btn">保存</button>
+        </form>
+        <p class="meta">今日已发 <span class="mono" id="proToday">—</span> 条。每日上限为 0 表示不限。</p>
+        <p class="status" id="proStatus" role="status" hidden></p>
+      </section>
+
+      <!-- 5 模型 -->
+      <section class="panel" id="panel-models" role="tabpanel" aria-labelledby="tab-models" data-panel="models" hidden>
+        <p class="status" id="modelStatus" role="status" hidden></p>
+
+        <h3 class="sec">连接</h3>
+        <div class="kv-grid">
+          <div class="kv-row"><span class="k">接口地址 base_url</span><span class="v mono" id="pvBase">—</span></div>
+          <div class="kv-row"><span class="k">主模型 model</span><span class="v mono" id="pvModel">—</span></div>
+          <div class="kv-row"><span class="k">API key</span><span class="v mono" id="pvKey">—</span></div>
+          <div class="kv-row"><span class="k">mock 模式</span><span class="v" id="pvMock">—</span></div>
+        </div>
+
+        <h3 class="sec">采样参数</h3>
+        <form class="form-row" id="modelForm">
+          <label class="field">温度 temperature <input type="number" id="mTemperature" min="0" max="2" step="0.05" inputmode="decimal"></label>
+          <label class="field">最大 tokens <input type="number" id="mMaxTokens" min="1" step="1" inputmode="numeric"></label>
+          <label class="field grow">小模型 small_model <input type="text" id="mSmallModel" placeholder="留空表示不使用" autocomplete="off"></label>
+          <button type="submit" class="btn">保存参数</button>
+        </form>
+        <p class="status" id="paramStatus" role="status" hidden></p>
+
+        <h3 class="sec">对话风格</h3>
+        <div class="style-list" id="styleList"></div>
+
+        <h3 class="sec">偏好开关</h3>
+        <div class="switch-list">
+          <div class="switch-row">
+            <div><span class="switch-label">混合模式</span><p class="hint">按场景在两种模型间切换。</p></div>
+            <button type="button" class="switch" id="swMix" role="switch" aria-checked="false" aria-label="混合模式"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">深思</span><p class="hint">回复前多想一步。</p></div>
+            <button type="button" class="switch" id="swDeep" role="switch" aria-checked="false" aria-label="深思"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">好感浮窗</span><p class="hint">对话后显示关系变化。</p></div>
+            <button type="button" class="switch" id="swDelta" role="switch" aria-checked="false" aria-label="好感浮窗"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">LLM 评估</span><p class="hint">用模型判断情感变化。</p></div>
+            <button type="button" class="switch" id="swAppraisal" role="switch" aria-checked="false" aria-label="LLM 评估"></button>
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="btn" id="prefSave">保存偏好</button>
+        </div>
+        <p class="status" id="prefStatus" role="status" hidden></p>
+
+        <h3 class="sec">任务路由</h3>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>任务</th><th>风格</th><th>风格 key</th></tr></thead>
+            <tbody id="taskBody"></tbody>
+          </table>
+        </div>
+
+        <h3 class="sec">用量</h3>
+        <div class="totals" id="totals"></div>
+        <p class="status" id="statsStatus" role="status" hidden></p>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>模型</th><th>风格</th><th>输入</th><th>输出</th><th>花费</th><th>调用</th></tr></thead>
+            <tbody id="byModel"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6 灵魂 -->
+      <section class="panel" id="panel-soul" role="tabpanel" aria-labelledby="tab-soul" data-panel="soul" hidden>
+        <h3 class="sec">导出</h3>
+        <p class="hint">把当前记忆与人格写成一个 JSON 文件。</p>
+        <div class="row">
+          <button type="button" class="btn" id="soulExport">导出</button>
+        </div>
+        <p class="status" id="exportStatus" role="status" hidden></p>
+        <div class="out" id="exportOut"></div>
+
+        <h3 class="sec">快照</h3>
+        <div class="row">
+          <button type="button" class="btn" id="snapNew">新建快照</button>
+          <button type="button" class="btn" id="snapReload">刷新</button>
+        </div>
+        <p class="meta">目录 <span class="mono" id="snapDir">—</span></p>
+        <p class="status" id="snapStatus" role="status" hidden></p>
+        <div class="snap-list" id="snapList"></div>
+
+        <h3 class="sec">导入</h3>
+        <p class="hint">导入会覆盖当前记忆与人格文件，操作前请确认。</p>
+        <label class="field">JSON 文件 <input type="file" id="soulFile" accept=".json,application/json"></label>
+        <p class="status" id="importStatus" role="status" hidden></p>
+        <div class="out" id="importOut"></div>
+      </section>
+      <!-- 7 工具与声音 -->
+      <section class="panel" id="panel-tools" role="tabpanel" aria-labelledby="tab-tools" data-panel="tools" hidden>
+        <p class="status" id="toolsStatus" role="status" hidden></p>
+
+        <h3 class="sec">工具环节<span class="sv-scan" aria-hidden="true"></span></h3>
+        <p class="hint">联网查资料、读链接、看她收到的图。关掉就是纯聊天——这些 token 一分不花。</p>
+        <div class="switch-list">
+          <div class="switch-row">
+            <div><span class="switch-label">工具总开关</span><p class="hint">关掉后所有工具都不调。</p></div>
+            <button type="button" class="switch" id="swTools" role="switch" aria-checked="false" aria-label="工具总开关"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">群聊里也调工具</span><p class="hint">默认关：群里人多，搜索与识图容易烧钱。</p></div>
+            <button type="button" class="switch" id="swToolsGroup" role="switch" aria-checked="false" aria-label="群聊工具"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">联网（搜索 / 读链接）</span><p class="hint">只在「查一下 / 贴了链接」时触发。</p></div>
+            <button type="button" class="switch" id="swWeb" role="switch" aria-checked="false" aria-label="联网工具"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">识图</span><p class="hint">用户发图时调视觉模型。</p></div>
+            <button type="button" class="switch" id="swVision" role="switch" aria-checked="false" aria-label="识图"></button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="field grow">视觉模型 <input type="text" id="visionModel" placeholder="留空 = 跟主模型一致" autocomplete="off"></label>
+          <label class="field grow">视觉端点 base_url <input type="text" id="visionBase" placeholder="留空 = 跟主模型同端点" autocomplete="off"></label>
+        </div>
+        <div class="row">
+          <button type="button" class="btn" id="toolsSave">保存工具设置</button>
+          <button type="button" class="btn btn--ghost" id="toolsRefresh">刷新状态</button>
+        </div>
+        <div class="kv-grid">
+          <div class="kv-row"><span class="k">当前状态</span><span class="v" id="toolsState">—</span></div>
+          <div class="kv-row"><span class="k">mock 模式</span><span class="v" id="toolsMock">—</span></div>
+        </div>
+
+        <h3 class="sec">声音（TTS）<span class="sv-scan" aria-hidden="true"></span></h3>
+        <p class="hint">对接本地声音服务。合成走独立线程池，不占聊天；关着就不连、不花算力。</p>
+        <div class="switch-list">
+          <div class="switch-row">
+            <div><span class="switch-label">声音总开关</span><p class="hint">关掉后三个 TTS 接口都直接拒绝。</p></div>
+            <button type="button" class="switch" id="swTts" role="switch" aria-checked="false" aria-label="声音总开关"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">合成完直接发语音</span><p class="hint">仅 OneBot 通道；关掉只生成文件不发送。</p></div>
+            <button type="button" class="switch" id="swTtsSend" role="switch" aria-checked="false" aria-label="直接发语音"></button>
+          </div>
+          <div class="switch-row">
+            <div><span class="switch-label">复用缓存</span><p class="hint">同一句话不重复合成。</p></div>
+            <button type="button" class="switch" id="swTtsCache" role="switch" aria-checked="false" aria-label="复用缓存"></button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="field grow">服务地址 <input type="text" id="ttsBase" placeholder="http://127.0.0.1:9880" autocomplete="off"></label>
+          <label class="field">音色 <input type="text" id="ttsVoice" placeholder="feiyu" autocomplete="off"></label>
+          <label class="field">风格 <input type="text" id="ttsStyle" placeholder="cute" autocomplete="off"></label>
+        </div>
+        <div class="form-row">
+          <label class="field">每分钟上限 <input type="number" id="ttsRate" min="0" max="60" step="1" inputmode="numeric"></label>
+          <label class="field">缓存保留天数 <input type="number" id="ttsTtl" min="0" max="365" step="1" inputmode="numeric"></label>
+          <label class="field grow">试听文本 <input type="text" id="ttsText" placeholder="你好呀，今天过得怎么样" autocomplete="off"></label>
+        </div>
+        <div class="row">
+          <button type="button" class="btn" id="ttsSave">保存声音设置</button>
+          <button type="button" class="btn btn--ghost" id="ttsPreview">试听</button>
+          <audio id="ttsPlayer" controls hidden></audio>
+        </div>
+        <p class="status" id="ttsStatus" role="status" hidden></p>
+        <div class="kv-grid">
+          <div class="kv-row"><span class="k">服务状态</span><span class="v" id="ttsState">—</span></div>
+          <div class="kv-row"><span class="k">缓存文件</span><span class="v mono" id="ttsCacheFiles">—</span></div>
+          <div class="kv-row"><span class="k">本分钟额度</span><span class="v mono" id="ttsQuota">—</span></div>
+        </div>
+      </section>
+
+      <!-- 8 连接与账号 -->
+      <section class="panel" id="panel-account" role="tabpanel" aria-labelledby="tab-account" data-panel="account" hidden>
+        <p class="status" id="accountStatus" role="status" hidden></p>
+
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title">连接与账号</h2>
+            <p class="card-note">接哪家模型、小号与 NapCat 装在哪、家里有谁。保存后立刻生效，重启也还在。</p>
+          </div>
+
+          <h3 class="sec">模型 API Key</h3>
+          <div class="kv-grid">
+            <div class="kv-row"><span class="k">当前端点 / 模型</span><span class="v mono" id="accountProviderMeta">—</span></div>
+            <div class="kv-row"><span class="k">已保存的 key</span><span class="v mono" id="accountKeyMasked">—</span></div>
+          </div>
+          <div class="form-row">
+            <label class="field grow">新的 API Key
+              <input type="password" id="accountApiKey" placeholder="留空 = 不修改" autocomplete="off" spellcheck="false">
+            </label>
+            <button type="button" class="btn" id="accountKeySave">保存 Key</button>
+          </div>
+          <p class="hint">key 只写进本机 config.local.yaml；接口只回打码值，不会回显完整 key。</p>
+          <p class="status" id="accountKeyStatus" role="status" hidden></p>
+
+          <h3 class="sec">小号与 NapCat</h3>
+          <div class="form-row">
+            <label class="field">小号 QQ
+              <input type="text" id="launcherQq" inputmode="numeric" placeholder="输入小号 QQ" autocomplete="off">
+            </label>
+            <label class="field grow">NapCat 安装目录
+              <input type="text" id="launcherNapcatDir" placeholder="C:\path\to\NapCat" autocomplete="off" spellcheck="false">
+            </label>
+            <label class="field">NapCat WebUI 端口
+              <input type="number" id="launcherWebuiPort" min="0" max="65535" step="1" inputmode="numeric" placeholder="6099">
+            </label>
+          </div>
+          <p class="hint">NapCat-Shell 根目录，里面有 launcher.bat；留空 = 启动器不猜位置，只跳过快速登录。</p>
+          <p class="meta" id="accountQqMasked">—</p>
+          <div class="kv-grid">
+            <div class="kv-row"><span class="k">语音服务地址</span><span class="v mono" id="accountTtsBase">—</span></div>
+          </div>
+          <p class="hint">语音地址在「工具」页的「声音（TTS）」里改，这里只显示当前值。</p>
+
+          <h3 class="sec">家人</h3>
+          <p class="hint">生父/干爹不会进恋爱线；她处对象、认错时会通知这些人。别名用逗号分隔，改号改名也认。</p>
+          <div class="family-list" id="familyList"></div>
+          <div class="row">
+            <button type="button" class="btn btn--ghost" id="familyAdd">添加家人</button>
+          </div>
+          <label class="check-row">
+            <input type="checkbox" id="familyGodfather">
+            <span>干爹也通知</span>
+          </label>
+
+          <div class="row card-actions">
+            <button type="button" class="btn" id="accountSave">保存连接与账号</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">衡忆 · M5 · 设置面板</footer>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var loaded = {};
+      var currentTab = 'persona';
+      var state = { models: null };
+      var selectedStyle = '';
+
+      /* ---------------- 基础工具 ---------------- */
+
+      function $(id) { return document.getElementById(id); }
+      function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+      function el(tag, cls, text) {
+        var node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text !== undefined && text !== null) node.textContent = String(text);
+        return node;
+      }
+      function clearNode(node) {
+        while (node && node.firstChild) node.removeChild(node.firstChild);
+        return node;
+      }
+      function txt(value) {
+        if (value === null || value === undefined || value === '') return '—';
+        return String(value);
+      }
+      function isNum(value) {
+        if (value === null || value === undefined || value === '') return false;
+        return isFinite(Number(value));
+      }
+      function fmt(value, digits) {
+        if (!isNum(value)) return '—';
+        var n = Number(value);
+        var d = (typeof digits === 'number') ? digits : 1;
+        return n.toFixed(d);
+      }
+      function fmtInt(value) {
+        if (!isNum(value)) return '—';
+        return String(Math.round(Number(value)));
+      }
+      function signed(value) {
+        if (!isNum(value)) return '—';
+        var n = Number(value);
+        if (Math.abs(n) < 0.05) return '0.0';
+        var base = Math.abs(n).toFixed(1);
+        return n > 0 ? '+' + base : '-' + base;
+      }
+      function boolText(value, yes, no) {
+        if (value === true) return yes;
+        if (value === false) return no;
+        return '—';
+      }
+      function deltaPart(label, value) {
+        if (!isNum(value)) return '';
+        return label + ' ' + signed(value);
+      }
+      function errorMessage(err) {
+        if (err && typeof err.message === 'string' && err.message) return err.message;
+        return '请求未完成，稍后再试。';
+      }
+      function setStatus(id, text, isError) {
+        var node = $(id);
+        if (!node) return;
+        node.textContent = text || '';
+        node.classList.toggle('err', !!isError);
+        node.hidden = !text;
+      }
+      function showError(id, prefix, err) {
+        var msg = errorMessage(err);
+        setStatus(id, prefix + msg, true);
+      }
+
+      /* ---------------- 请求 ---------------- */
+
+      function jsonBody(payload) {
+        return {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        };
+      }
+
+      async function api(path, options) {
+        var res;
+        try {
+          res = await fetch(path, options || {});
+        } catch (err) {
+          throw new Error('无法连接本地服务，请确认后端正在运行。');
+        }
+        var raw = '';
+        try { raw = await res.text(); } catch (err) { raw = ''; }
+        var data = null;
+        if (raw) {
+          try { data = JSON.parse(raw); } catch (err) { data = null; }
+        }
+        if (!res.ok) {
+          var detail = '';
+          if (data && typeof data === 'object') {
+            if (typeof data.detail === 'string') detail = data.detail;
+            else if (typeof data.error === 'string') detail = data.error;
+            else if (typeof data.message === 'string') detail = data.message;
+            else if (data.detail) {
+              try { detail = JSON.stringify(data.detail); } catch (err) { detail = ''; }
+            }
+          }
+          var failure = new Error(detail || ('服务返回错误 ' + res.status));
+          failure.status = res.status;
+          throw failure;
+        }
+        if (data === null) {
+          if (raw) throw new Error('返回内容不是有效 JSON。');
+          return {};
+        }
+        return data;
+      }
+
+      /* ---------------- 表格工具 ---------------- */
+
+      function emptyRow(tbody, cols, text) {
+        var tr = el('tr');
+        var td = el('td', 'hint', text || '暂无数据。');
+        if (cols > 1) td.colSpan = cols;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+
+      function renderStageTable(tbodyId, rows) {
+        var tbody = clearNode($(tbodyId));
+        if (!Array.isArray(rows) || !rows.length) {
+          emptyRow(tbody, 3, '暂无阶段数据。');
+          return;
+        }
+        rows.forEach(function (item) {
+          var row = item || {};
+          var tr = el('tr');
+          tr.appendChild(el('td', null, txt(row.label)));
+          tr.appendChild(el('td', 'mono', fmtInt(row.at)));
+          tr.appendChild(el('td', null, txt(row.call_user)));
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderQuietList(listId, items) {
+        var list = clearNode($(listId));
+        if (!Array.isArray(items) || !items.length) {
+          list.appendChild(el('li', 'hint', '暂无内容。'));
+          return;
+        }
+        items.forEach(function (item) {
+          var text;
+          if (typeof item === 'string') text = item;
+          else if (item && typeof item === 'object') text = item.text || item.content || '—';
+          else text = txt(item);
+          list.appendChild(el('li', null, text));
+        });
+      }
+
+      /* ---------------- 页签 ---------------- */
+
+      var loaders = {
+        persona: loadPersona,
+        relation: loadRelation,
+        memory: loadMemories,
+        schedule: loadSchedule,
+        models: loadModels,
+        soul: loadSoul,
+        tools: loadTools,
+        account: loadAccount
+      };
+
+      function activateTab(name) {
+        if (!loaders[name]) return;
+        currentTab = name;
+        $$('.tab').forEach(function (btn) {
+          var on = btn.getAttribute('data-tab') === name;
+          btn.classList.toggle('on', on);
+          btn.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        $$('.panel').forEach(function (panel) {
+          panel.hidden = panel.getAttribute('data-panel') !== name;
+        });
+        if (!loaded[name]) {
+          loaded[name] = true;
+          loaders[name]();
+        }
+      }
+
+      function reloadCurrent() {
+        if (!loaders[currentTab]) return;
+        loaded[currentTab] = true;
+        loaders[currentTab]();
+      }
+
+      /* ---------------- 人物 ---------------- */
+
+      function updateTraitLabel(node, value) {
+        var b = node.querySelector('b');
+        if (b) b.textContent = fmt(value, 1);
+      }
+
+      function renderTraits(traits) {
+        var box = clearNode($('traits'));
+        if (!Array.isArray(traits) || !traits.length) {
+          box.appendChild(el('p', 'hint', '暂无维度数据。'));
+          return;
+        }
+        traits.forEach(function (raw) {
+          var item = raw || {};
+          var dim = item.dim === undefined || item.dim === null || item.dim === '' ? '—' : String(item.dim);
+          var min = isNum(item.min) ? Number(item.min) : 0;
+          var max = isNum(item.max) ? Number(item.max) : 100;
+          if (max <= min) max = min + 100;
+          var value = isNum(item.value) ? Number(item.value) : (isNum(item.baseline) ? Number(item.baseline) : min);
+          value = Math.min(max, Math.max(min, value));
+
+          var wrap = el('div', 'trait');
+          var head = el('div', 'trait-head');
+          head.appendChild(el('span', 'trait-name', dim));
+          var nums = el('div', 'trait-num');
+          nums.appendChild(el('b', null, fmt(value, 1)));
+          var baseline = el('span');
+          baseline.textContent = '基准 ' + (isNum(item.baseline) ? fmt(item.baseline, 1) : '—');
+          nums.appendChild(baseline);
+          head.appendChild(nums);
+
+          var input = document.createElement('input');
+          input.type = 'range';
+          input.min = String(min);
+          input.max = String(max);
+          input.step = '0.1';
+          input.value = String(value);
+          input.setAttribute('aria-label', dim);
+          input.addEventListener('input', function () { updateTraitLabel(wrap, input.value); });
+          input.addEventListener('change', function () { saveTrait(dim, input.value); });
+
+          wrap.appendChild(head);
+          wrap.appendChild(input);
+          box.appendChild(wrap);
+        });
+      }
+
+      function renderPersona(data) {
+        var persona = data || {};
+        $('personaName').textContent = txt(persona.name);
+        $('personaTagline').textContent = txt(persona.tagline);
+        $('personaAge').textContent = txt(persona.age_label);
+        $('personaSpecies').textContent = txt(persona.species);
+        renderTraits(persona.traits);
+        renderQuietList('quotes', persona.quotes);
+        renderQuietList('negatives', persona.negatives);
+        renderStageTable('personaStage', persona.stage_table);
+      }
+
+      async function loadPersona() {
+        setStatus('personaStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/persona');
+          renderPersona(data);
+          setStatus('personaStatus', '', false);
+        } catch (err) {
+          loaded.persona = false;
+          showError('personaStatus', '加载失败：', err);
+        }
+        loadDiary();
+      }
+
+      async function loadDiary() {
+        setStatus('diaryStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/diary');
+          var items = (data && data.items) || [];
+          var list = clearNode($('diaryList'));
+          if (!items.length) {
+            list.appendChild(el('li', 'hint', '还没有日记。聊过一天之后，会在第二天自动补写。'));
+          } else {
+            items.forEach(function (item) {
+              var li = el('li');
+              li.appendChild(el('b', 'mono', txt(item.day || '—')));
+              li.appendChild(document.createTextNode('　' + txt(item.text || '')));
+              list.appendChild(li);
+            });
+          }
+          setStatus('diaryStatus', '', false);
+        } catch (err) {
+          showError('diaryStatus', '加载失败：', err);
+        }
+      }
+
+      async function saveTrait(dim, value) {
+        var num = Number(value);
+        if (!isFinite(num)) {
+          setStatus('personaStatus', '保存失败：数值无效。', true);
+          return;
+        }
+        try {
+          var data = await api('/v1/persona/traits', jsonBody({ dim: dim, value: num }));
+          if (data && data.ok === false) throw new Error('服务未确认保存。');
+          var next = null;
+          if (data && Array.isArray(data.traits)) next = data.traits;
+          else if (data && data.persona && Array.isArray(data.persona.traits)) next = data.persona.traits;
+          if (next) renderTraits(next);
+          setStatus('personaStatus', '已保存：' + dim, false);
+        } catch (err) {
+          showError('personaStatus', '保存失败：', err);
+        }
+      }
+
+      /* ---------------- 关系 ---------------- */
+
+      function renderBars(relation) {
+        var box = clearNode($('relBars'));
+        var rows = [
+          ['好感', relation.affinity],
+          ['信任', relation.trust],
+          ['心动', relation.attraction]
+        ];
+        rows.forEach(function (row) {
+          var wrap = el('div', 'bar-row');
+          var head = el('div', 'bar-head');
+          head.appendChild(el('span', null, row[0]));
+          head.appendChild(el('b', null, fmt(row[1], 1)));
+          var track = el('div', 'bar');
+          var fill = el('i');
+          var pct = isNum(row[1]) ? Math.min(100, Math.max(0, Number(row[1]))) : 0;
+          fill.style.width = String(pct) + '%';
+          track.appendChild(fill);
+          wrap.appendChild(head);
+          wrap.appendChild(track);
+          box.appendChild(wrap);
+        });
+      }
+
+      function renderRelation(data) {
+        var board = data || {};
+        var relation = board.relation || {};
+        renderBars(relation);
+        $('relStage').textContent = txt(relation.stage_label);
+        $('relCall').textContent = txt(relation.call_user);
+        $('relAversion').textContent = fmt(relation.aversion, 1);
+        renderStageTable('relationStage', board.stage_table);
+
+        var prefill = [
+          ['calAffinity', relation.affinity],
+          ['calTrust', relation.trust],
+          ['calAttraction', relation.attraction]
+        ];
+        prefill.forEach(function (pair) {
+          var input = $(pair[0]);
+          if (input && !input.value && isNum(pair[1])) input.value = String(Math.round(Number(pair[1])));
+        });
+      }
+
+      async function loadRelation() {
+        setStatus('relationStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/board');
+          renderRelation(data);
+          setStatus('relationStatus', '', false);
+        } catch (err) {
+          loaded.relation = false;
+          showError('relationStatus', '加载失败：', err);
+        }
+        loadRelationLog();
+      }
+
+      /* uid → 昵称：关系日志/记忆都要显示"这是谁的"，不能让两个人的数值混在一起看 */
+      var ownerNames = {};
+      async function loadOwnerNames() {
+        if (Object.keys(ownerNames).length) return ownerNames;
+        ownerNames[0] = '面板（她自己）';
+        try {
+          var data = await api('/v1/console/friends');
+          (data && data.friends || []).forEach(function (f) {
+            if (f && f.user_id !== undefined) {
+              ownerNames[String(f.user_id)] = String(f.nickname || ('uid ' + f.user_id));
+            }
+          });
+        } catch (err) { /* 名字取不到就显示 uid，不影响列表 */ }
+        return ownerNames;
+      }
+      function nameOf(uid) {
+        var key = String(uid === undefined || uid === null ? '' : uid);
+        return ownerNames[key] || (key === '0' ? '面板（她自己）' : 'uid ' + key);
+      }
+
+      async function loadRelationLog() {
+        var tbody = clearNode($('relLog'));
+        setStatus('logStatus', '加载中…', false);
+        await loadOwnerNames();
+        try {
+          var data = await api('/v1/relation/log?limit=20');
+          var items = data && Array.isArray(data.items) ? data.items : [];
+          if (!items.length) {
+            tbody.appendChild(el('li', 'log-item hint', '没有事件记录。'));
+          }
+          items.forEach(function (raw) {
+            var item = raw || {};
+            var li = el('li', 'log-item');
+            var head = el('div', 'log-head');
+            head.appendChild(el('span', 'log-ts mono', txt(item.ts)));
+            head.appendChild(el('span', 'log-owner', '「' + nameOf(item.user_id) + '」'));
+            var parts = [
+              deltaPart('好感', item.d_affinity),
+              deltaPart('信任', item.d_trust),
+              deltaPart('心动', item.d_attraction)
+            ].filter(function (part) { return part; });
+            head.appendChild(el('span', 'log-delta mono', parts.length ? parts.join('  ') : '—'));
+            li.appendChild(head);
+            if (item.reason !== undefined && item.reason !== null && item.reason !== '') {
+              li.appendChild(el('div', 'log-reason', txt(item.reason)));
+            }
+            if (item.trigger !== undefined && item.trigger !== null && item.trigger !== '') {
+              li.appendChild(el('div', 'log-trigger mono', txt(item.trigger)));
+            }
+            tbody.appendChild(li);
+          });
+          setStatus('logStatus', '', false);
+        } catch (err) {
+          showError('logStatus', '流水加载失败：', err);
+        }
+      }
+
+      function readUnitValue(inputId) {
+        var input = $(inputId);
+        if (!input || input.value.trim() === '') return null;
+        var n = Number(input.value);
+        if (!isFinite(n) || n < 0 || n > 100) return null;
+        return n;
+      }
+
+      async function calibrate() {
+        var affinity = readUnitValue('calAffinity');
+        var trust = readUnitValue('calTrust');
+        var attraction = readUnitValue('calAttraction');
+        if (affinity === null || trust === null || attraction === null) {
+          setStatus('calStatus', '请输入 0 到 100 的数字。', true);
+          return;
+        }
+        setStatus('calStatus', '校准中…', false);
+        try {
+          await api('/v1/relation', jsonBody({ affinity: affinity, trust: trust, attraction: attraction }));
+          setStatus('calStatus', '已校准。', false);
+          loadRelation();
+        } catch (err) {
+          if (err && err.status === 403) {
+            setStatus('calStatus', '开发者开关未开启，校准不可用', true);
+          } else {
+            showError('calStatus', '校准未完成：', err);
+          }
+        }
+      }
+
+      /* ---------------- 记忆 ---------------- */
+
+      var MEM_KIND = { fact: '事实', boundary: '雷点', preference: '偏好', event: '事件', diary: '日记' };
+      function kindText(kind) {
+        if (!kind) return '—';
+        return MEM_KIND[kind] || String(kind);
+      }
+
+      function renderMemories(items, total, owners) {
+        var list = clearNode($('memList'));
+        fillOwnerOptions(owners);
+        if (!Array.isArray(items) || !items.length) {
+          list.appendChild(el('p', 'hint', '没有匹配的记忆。'));
+          return;
+        }
+        /* 按归属分组：全部模式下不同人的记忆不能糊成一锅（2026-11-02 owner 反馈） */
+        var groups = [];
+        var byOwner = {};
+        items.forEach(function (raw) {
+          var item = raw || {};
+          var key = String(item.user_id === undefined || item.user_id === null ? '' : item.user_id);
+          if (!byOwner[key]) {
+            byOwner[key] = { name: item.owner || (isNum(item.user_id) && Number(item.user_id) === 0 ? '面板（她自己）' : 'uid ' + key), items: [] };
+            groups.push(byOwner[key]);
+          }
+          byOwner[key].items.push(item);
+        });
+        groups.forEach(function (group) {
+          if ($('memOwner').value === '') {
+            var head = el('h3', 'mem-group');
+            head.appendChild(el('span', null, group.name));
+            head.appendChild(el('span', 'mono', ' ' + fmtInt(group.items.length) + ' 条'));
+            list.appendChild(head);
+          }
+          group.items.forEach(function (item) { list.appendChild(memCard(item, group.name)); });
+        });
+        setStatus('memStatus', '共 ' + (isNum(total) ? fmtInt(total) : items.length) + ' 条，' + groups.length + ' 个人的归属。', false);
+      }
+
+      function memCard(item, ownerName) {
+        var card = el('article', 'mem-item');
+        var head = el('div', 'mem-head');
+        head.appendChild(el('span', 'mem-kind', kindText(item.kind)));
+        head.appendChild(el('span', 'mem-owner', '「' + ownerName + '」'));
+        head.appendChild(el('span', 'mem-imp mono', '重要性 ' + fmt(item.importance, 2)));
+        if (item.pinned === true) head.appendChild(el('span', 'mem-pin', '已钉'));
+        card.appendChild(head);
+        card.appendChild(el('p', 'mem-text', txt(item.content)));
+
+        var actions = el('div', 'mem-actions');
+        var pinBtn = el('button', 'btn btn--sm', item.pinned === true ? '取消钉住' : '钉住');
+        pinBtn.type = 'button';
+        pinBtn.addEventListener('click', function () { togglePin(item); });
+        var delBtn = el('button', 'btn btn--sm', '删除');
+        delBtn.type = 'button';
+        delBtn.addEventListener('click', function () { deleteMemory(item); });
+        actions.appendChild(pinBtn);
+        actions.appendChild(delBtn);
+        card.appendChild(actions);
+        return card;
+      }
+
+      function fillOwnerOptions(owners) {
+        var sel = $('memOwner');
+        if (!sel || sel.getAttribute('data-filled') === '1') return;
+        (owners || []).forEach(function (owner) {
+          if (!owner) return;
+          var opt = document.createElement('option');
+          opt.value = String(owner.user_id);
+          opt.textContent = owner.nickname + '（' + fmtInt(owner.count || 0) + '）';
+          sel.appendChild(opt);
+        });
+        sel.setAttribute('data-filled', '1');
+      }
+
+      async function loadMemories() {
+        var kind = $('memKind').value;
+        var q = $('memQ').value.trim();
+        var owner = $('memOwner') ? $('memOwner').value : '';
+        var params = ['limit=100'];
+        if (kind) params.push('kind=' + encodeURIComponent(kind));
+        if (q) params.push('q=' + encodeURIComponent(q));
+        if (owner !== '') params.push('user_id=' + encodeURIComponent(owner));
+        setStatus('memStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/memories?' + params.join('&'));
+          var items = data && Array.isArray(data.items) ? data.items : [];
+          renderMemories(items, data && data.total, data && data.owners);
+          loaded.memory = true;
+        } catch (err) {
+          loaded.memory = false;
+          clearNode($('memList')).appendChild(el('p', 'hint', '列表加载失败。'));
+          showError('memStatus', '加载失败：', err);
+        }
+      }
+
+      async function togglePin(item) {
+        var id = item && item.id !== undefined ? item.id : '';
+        try {
+          await api('/v1/memories/' + encodeURIComponent(id) + '/pin', jsonBody({ pinned: item.pinned !== true }));
+          await loadMemories();
+        } catch (err) {
+          showError('memStatus', '钉住未完成：', err);
+        }
+      }
+
+      async function deleteMemory(item) {
+        var id = item && item.id !== undefined ? item.id : '';
+        var preview = txt(item && item.content);
+        if (!window.confirm('删除这条记忆？\n' + preview)) return;
+        try {
+          await api('/v1/memories/' + encodeURIComponent(id), { method: 'DELETE' });
+          await loadMemories();
+        } catch (err) {
+          showError('memStatus', '删除未完成：', err);
+        }
+      }
+
+      function collectContents(value) {
+        var out = [];
+        var walk = function (node, depth) {
+          if (depth > 3 || node === null || node === undefined) return;
+          if (typeof node === 'string') {
+            var s = node.trim();
+            if (s) out.push(s);
+            return;
+          }
+          if (Array.isArray(node)) {
+            node.forEach(function (child) { walk(child, depth + 1); });
+            return;
+          }
+          if (typeof node === 'object') {
+            var keys = ['content', 'text', 'quote', 'memory'];
+            for (var i = 0; i < keys.length; i++) {
+              var v = node[keys[i]];
+              if (typeof v === 'string' && v.trim()) {
+                out.push(v.trim());
+                return;
+              }
+            }
+            if (Array.isArray(node.items)) walk(node.items, depth + 1);
+            return;
+          }
+          out.push(String(node));
+        };
+        walk(value, 0);
+        return out.slice(0, 40);
+      }
+
+      function recallValueText(value) {
+        if (value === null || value === undefined) return null;
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value);
+        return null;
+      }
+
+      function renderRecallGroup(parent, label, value) {
+        var block = el('div', 'recall-block');
+        block.appendChild(el('div', 'recall-title', label));
+        var list = el('ul', 'quiet-list');
+        var contents = collectContents(value);
+        if (!contents.length) {
+          list.appendChild(el('li', 'hint', '—'));
+        }
+        contents.forEach(function (text) { list.appendChild(el('li', null, text)); });
+        block.appendChild(list);
+        parent.appendChild(block);
+      }
+
+      function renderRecall(data) {
+        var box = clearNode($('recallOut'));
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+          box.appendChild(el('p', 'hint', '返回结构无法识别。'));
+          return;
+        }
+        var statusText = recallValueText(data.status);
+        if (statusText === null) statusText = recallValueText(data.ok);
+        box.appendChild(el('p', 'meta', 'status ' + (statusText === null ? '—' : statusText)));
+
+        var groups = [
+          ['hot', 'hot 热记忆'],
+          ['recalled', 'recalled 召回'],
+          ['cold', 'cold 冷记忆'],
+          ['items', 'items 结果'],
+          ['quotes', 'quotes 语录']
+        ];
+        var shown = 0;
+        groups.forEach(function (pair) {
+          if (data[pair[0]] !== undefined && data[pair[0]] !== null) {
+            renderRecallGroup(box, pair[1], data[pair[0]]);
+            shown += 1;
+          }
+        });
+        if (!shown) box.appendChild(el('p', 'hint', '返回结构无法识别。'));
+      }
+
+      async function runRecall() {
+        var q = $('recallQ').value.trim();
+        if (!q) {
+          setStatus('recallStatus', '先输入一句话。', true);
+          return;
+        }
+        setStatus('recallStatus', '召回中…', false);
+        try {
+          var data = await api('/v1/memory/recall?q=' + encodeURIComponent(q));
+          renderRecall(data);
+          setStatus('recallStatus', '', false);
+        } catch (err) {
+          clearNode($('recallOut'));
+          showError('recallStatus', '召回未完成：', err);
+        }
+      }
+
+      /* ---------------- 日程 ---------------- */
+
+      function renderScheduleTable(rows) {
+        var tbody = clearNode($('scheduleBody'));
+        if (!Array.isArray(rows) || !rows.length) {
+          emptyRow(tbody, 4, '暂无作息数据。');
+          return;
+        }
+        rows.forEach(function (raw) {
+          var item = raw || {};
+          var tr = el('tr');
+          tr.appendChild(el('td', 'mono', txt(item.start)));
+          tr.appendChild(el('td', null, txt(item.activity)));
+          tr.appendChild(el('td', 'mono', fmt(item.energy, 0)));
+          tr.appendChild(el('td', null, boolText(item.sleeping, '是', '否')));
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderSchedule(data) {
+        var schedule = data || {};
+        var now = schedule.now || {};
+        $('nowTime').textContent = txt(now.virtual_time_human);
+        $('nowActivity').textContent = txt(now.activity);
+        $('nowEnergy').textContent = fmt(now.energy, 1);
+        $('nowSleep').textContent = boolText(now.sleeping, '是', '否');
+        renderScheduleTable(schedule.table);
+
+        var proactive = schedule.proactive || {};
+        setSwitch('proEnabled', proactive.enabled === true);
+        if (isNum(proactive.cooldown_min)) $('proCooldown').value = String(Math.round(Number(proactive.cooldown_min)));
+        if (isNum(proactive.daily_max)) $('proDaily').value = String(Math.round(Number(proactive.daily_max)));
+        $('proToday').textContent = isNum(proactive.today_count) ? fmtInt(proactive.today_count) : '—';
+      }
+
+      async function loadSchedule() {
+        setStatus('schedStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/schedule');
+          renderSchedule(data);
+          setStatus('schedStatus', '', false);
+        } catch (err) {
+          loaded.schedule = false;
+          showError('schedStatus', '加载失败：', err);
+        }
+      }
+
+      async function saveProactive() {
+        var enabled = getSwitch('proEnabled');
+        var cooldown = toInt($('proCooldown').value);
+        var daily = toInt($('proDaily').value);
+        if (cooldown === null || cooldown < 1 || cooldown > 240) {
+          setStatus('proStatus', '冷却分钟需为 1 到 240 的整数。', true);
+          return;
+        }
+        if (daily === null || daily < 0) {
+          setStatus('proStatus', '每日上限需为 0 或更大的整数。', true);
+          return;
+        }
+        setStatus('proStatus', '保存中…', false);
+        try {
+          var data = await api('/v1/schedule', jsonBody({ proactive: { enabled: enabled, cooldown_min: cooldown, daily_max: daily } }));
+          var next = data && data.schedule ? data.schedule : null;
+          if (next) renderSchedule(next);
+          else await loadSchedule();
+          setStatus('proStatus', '已保存。', false);
+        } catch (err) {
+          showError('proStatus', '保存未完成：', err);
+        }
+      }
+
+      /* ---------------- 模型 ---------------- */
+
+      function renderProvider(provider) {
+        var p = provider || {};
+        $('pvBase').textContent = txt(p.base_url);
+        $('pvModel').textContent = txt(p.model);
+        if (p.has_key === true) {
+          $('pvKey').textContent = p.key_masked ? String(p.key_masked) : '已保存';
+        } else {
+          $('pvKey').textContent = '未填';
+        }
+        $('pvMock').textContent = boolText(p.is_mock, '是', '否');
+      }
+
+      function fillProviderForm(provider) {
+        var p = provider || {};
+        if (isNum(p.temperature)) $('mTemperature').value = String(Number(p.temperature));
+        if (isNum(p.max_tokens)) $('mMaxTokens').value = String(Math.round(Number(p.max_tokens)));
+        if (typeof p.small_model === 'string') $('mSmallModel').value = p.small_model;
+      }
+
+      function markStyleSelection() {
+        $$('.style-item').forEach(function (node) {
+          node.classList.toggle('on', node.getAttribute('data-key') === selectedStyle);
+        });
+      }
+
+      function renderStyles(styles, currentKey) {
+        var box = clearNode($('styleList'));
+        var list = Array.isArray(styles) ? styles : [];
+        if (!list.length) {
+          box.appendChild(el('p', 'hint', '没有可用风格。'));
+          selectedStyle = '';
+          return;
+        }
+        var current = (currentKey !== undefined && currentKey !== null && currentKey !== '') ? String(currentKey) : selectedStyle;
+        list.forEach(function (raw, index) {
+          var item = raw || {};
+          var key = (item.key !== undefined && item.key !== null && item.key !== '') ? String(item.key) : ('style-' + index);
+          var label = el('label', 'style-item');
+          label.setAttribute('data-key', key);
+          var input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'style';
+          input.value = key;
+          input.checked = current ? key === current : index === 0;
+          var body = el('div', 'style-text');
+          body.appendChild(el('span', 'style-name', txt(item.style)));
+          if (item.note !== undefined && item.note !== null && item.note !== '') {
+            body.appendChild(el('span', 'style-note', String(item.note)));
+          }
+          label.appendChild(input);
+          label.appendChild(body);
+          box.appendChild(label);
+        });
+        if (!current) {
+          var first = list[0] || {};
+          selectedStyle = (first.key !== undefined && first.key !== null && first.key !== '') ? String(first.key) : 'style-0';
+        } else {
+          selectedStyle = current;
+        }
+        markStyleSelection();
+      }
+
+      function renderSwitches(settings) {
+        if (!settings || typeof settings !== 'object') return;
+        if (typeof settings.mix_mode === 'boolean') setSwitch('swMix', settings.mix_mode);
+        if (typeof settings.deep_think === 'boolean') setSwitch('swDeep', settings.deep_think);
+        if (typeof settings.show_delta === 'boolean') setSwitch('swDelta', settings.show_delta);
+        if (typeof settings.llm_appraisal === 'boolean') setSwitch('swAppraisal', settings.llm_appraisal);
+      }
+
+      function renderTaskTable(tasks, labels, styles) {
+        var tbody = clearNode($('taskBody'));
+        var map = tasks && typeof tasks === 'object' ? tasks : {};
+        var keys = Object.keys(map);
+        if (!keys.length) {
+          emptyRow(tbody, 3, '暂无任务路由。');
+          return;
+        }
+        var names = {};
+        (Array.isArray(styles) ? styles : []).forEach(function (raw) {
+          var item = raw || {};
+          if (item.key !== undefined && item.key !== null) names[String(item.key)] = item.style;
+        });
+        keys.forEach(function (taskKey) {
+          var styleKey = map[taskKey];
+          var tr = el('tr');
+          var label = labels && typeof labels === 'object' ? labels[taskKey] : null;
+          tr.appendChild(el('td', null, label ? String(label) : taskKey));
+          tr.appendChild(el('td', null, styleKey ? (names[String(styleKey)] || String(styleKey)) : '—'));
+          tr.appendChild(el('td', 'mono', styleKey ? String(styleKey) : '—'));
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderTotals(totals) {
+        var box = clearNode($('totals'));
+        var t = totals || {};
+        var cells = [
+          ['输入 tokens', fmtInt(t.tokens_in)],
+          ['输出 tokens', fmtInt(t.tokens_out)],
+          ['预估花费', fmt(t.cost, 4)],
+          ['调用次数', fmtInt(t.calls)]
+        ];
+        cells.forEach(function (pair) {
+          var cell = el('div', 'total');
+          cell.appendChild(el('span', null, pair[0]));
+          var b = el('b');
+          b.textContent = pair[1];
+          cell.appendChild(b);
+          box.appendChild(cell);
+        });
+      }
+
+      function renderByModel(rows) {
+        var tbody = clearNode($('byModel'));
+        var list = Array.isArray(rows) ? rows : [];
+        if (!list.length) {
+          emptyRow(tbody, 6, '还没有用量记录。');
+          return;
+        }
+        list.forEach(function (raw) {
+          var item = raw || {};
+          var tr = el('tr');
+          tr.appendChild(el('td', 'mono', txt(item.model)));
+          tr.appendChild(el('td', null, txt(item.style)));
+          tr.appendChild(el('td', 'mono', fmtInt(item.tokens_in)));
+          tr.appendChild(el('td', 'mono', fmtInt(item.tokens_out)));
+          tr.appendChild(el('td', 'mono', fmt(item.cost, 4)));
+          tr.appendChild(el('td', 'mono', fmtInt(item.calls)));
+          tbody.appendChild(tr);
+        });
+      }
+
+      async function loadStats() {
+        setStatus('statsStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/stats?bucket=hour&limit=24');
+          renderTotals(data && data.totals);
+          renderByModel(data && data.by_model);
+          setStatus('statsStatus', '', false);
+        } catch (err) {
+          showError('statsStatus', '用量加载失败：', err);
+        }
+      }
+
+      async function loadModels() {
+        setStatus('modelStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/settings/models');
+          state.models = data || {};
+          renderProvider(data && data.provider);
+          fillProviderForm(data && data.provider);
+          renderStyles(data && data.styles, data && data.settings ? data.settings.style : undefined);
+          renderSwitches(data && data.settings);
+          renderTaskTable(data && data.tasks, data && data.task_labels, data && data.styles);
+          setStatus('modelStatus', '', false);
+        } catch (err) {
+          loaded.models = false;
+          showError('modelStatus', '加载失败：', err);
+        }
+        loadStats();
+      }
+
+      async function saveModelParams() {
+        var temperatureText = $('mTemperature').value.trim();
+        var maxTokensText = $('mMaxTokens').value.trim();
+        var temperature = Number(temperatureText);
+        var maxTokens = toInt(maxTokensText);
+        if (temperatureText === '' || !isFinite(temperature) || temperature < 0 || temperature > 2) {
+          setStatus('paramStatus', '温度需为 0 到 2 的数字。', true);
+          return;
+        }
+        if (maxTokensText === '' || maxTokens === null || maxTokens < 1) {
+          setStatus('paramStatus', '最大 tokens 需为 1 或更大的整数。', true);
+          return;
+        }
+        setStatus('paramStatus', '保存中…', false);
+        try {
+          var data = await api('/v1/settings/models', jsonBody({
+            temperature: temperature,
+            max_tokens: maxTokens,
+            small_model: $('mSmallModel').value.trim()
+          }));
+          if (data && data.ok === false) throw new Error('服务未确认保存。');
+          if (data && data.provider) {
+            renderProvider(data.provider);
+            fillProviderForm(data.provider);
+          }
+          setStatus('paramStatus', '已保存。', false);
+        } catch (err) {
+          showError('paramStatus', '保存未完成：', err);
+        }
+      }
+
+      async function savePreferences() {
+        var payload = {
+          mix_mode: getSwitch('swMix'),
+          deep_think: getSwitch('swDeep'),
+          show_delta: getSwitch('swDelta'),
+          llm_appraisal: getSwitch('swAppraisal')
+        };
+        if (selectedStyle) payload.style = selectedStyle;
+        setStatus('prefStatus', '保存中…', false);
+        try {
+          var data = await api('/v1/settings', jsonBody(payload));
+          var settings = data && typeof data.settings === 'object' && data.settings ? data.settings : data;
+          if (settings && typeof settings === 'object') {
+            renderSwitches(settings);
+            if (settings.style !== undefined && settings.style !== null) {
+              selectedStyle = String(settings.style);
+            }
+            var styles = (data && Array.isArray(data.styles)) ? data.styles : (state.models && state.models.styles);
+            if (Array.isArray(styles)) renderStyles(styles, selectedStyle);
+          }
+          setStatus('prefStatus', '已保存。', false);
+        } catch (err) {
+          showError('prefStatus', '保存未完成：', err);
+        }
+      }
+
+      /* ---------------- 灵魂 ---------------- */
+
+      async function exportSoul() {
+        setStatus('exportStatus', '导出中…', false);
+        var out = clearNode($('exportOut'));
+        try {
+          var data = await api('/v1/soul/export', { method: 'POST' });
+          if (data && data.path) out.appendChild(el('p', 'mono', String(data.path)));
+          if (data && isNum(data.bytes)) out.appendChild(el('p', 'meta', '大小 ' + fmtInt(data.bytes) + ' 字节'));
+          setStatus('exportStatus', '已导出。', false);
+        } catch (err) {
+          showError('exportStatus', '导出未完成：', err);
+        }
+      }
+
+      function renderSnapshots(data) {
+        $('snapDir').textContent = txt(data && data.dir);
+        var list = clearNode($('snapList'));
+        var items = data && Array.isArray(data.items) ? data.items : [];
+        if (!items.length) {
+          list.appendChild(el('p', 'hint', '还没有快照。'));
+          return;
+        }
+        items.forEach(function (raw) {
+          var item = raw || {};
+          var row = el('div', 'snap-item');
+          var info = el('div');
+          info.appendChild(el('span', 'snap-name mono', txt(item.name)));
+          var meta = el('span', 'snap-meta');
+          var parts = [];
+          if (item.created_at !== undefined && item.created_at !== null && item.created_at !== '') parts.push(String(item.created_at));
+          if (isNum(item.bytes)) parts.push(fmtInt(item.bytes) + ' 字节');
+          meta.textContent = parts.length ? parts.join(' · ') : '—';
+          info.appendChild(meta);
+          var restore = el('button', 'btn btn--sm', '恢复');
+          restore.type = 'button';
+          restore.addEventListener('click', function () { restoreSnapshot(item); });
+          row.appendChild(info);
+          row.appendChild(restore);
+          list.appendChild(row);
+        });
+      }
+
+      async function loadSnapshots() {
+        setStatus('snapStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/soul/snapshots');
+          renderSnapshots(data);
+          setStatus('snapStatus', '', false);
+        } catch (err) {
+          loaded.soul = false;
+          showError('snapStatus', '快照加载失败：', err);
+        }
+      }
+
+      function loadSoul() {
+        loadSnapshots();
+      }
+
+      async function createSnapshot() {
+        setStatus('snapStatus', '新建中…', false);
+        try {
+          await api('/v1/soul/snapshots', { method: 'POST' });
+          await loadSnapshots();
+          setStatus('snapStatus', '已新建快照。', false);
+        } catch (err) {
+          showError('snapStatus', '新建未完成：', err);
+        }
+      }
+
+      async function restoreSnapshot(item) {
+        var name = item && item.name ? String(item.name) : '';
+        if (!name) return;
+        if (!window.confirm('恢复快照 ' + name + '？当前记忆会被覆盖。')) return;
+        setStatus('snapStatus', '恢复中…', false);
+        try {
+          await api('/v1/soul/snapshots/restore', jsonBody({ name: name }));
+          await loadSnapshots();
+          setStatus('snapStatus', '已恢复：' + name, false);
+        } catch (err) {
+          showError('snapStatus', '恢复未完成：', err);
+        }
+      }
+
+      async function importSoul(file) {
+        if (!file) return;
+        setStatus('importStatus', '读取文件中…', false);
+        var text = '';
+        try {
+          text = await file.text();
+        } catch (err) {
+          setStatus('importStatus', '读取文件失败。', true);
+          return;
+        }
+        if (!text.trim()) {
+          setStatus('importStatus', '文件是空的。', true);
+          return;
+        }
+        if (!window.confirm('导入 ' + file.name + '？当前记忆与人格文件会被覆盖。')) {
+          setStatus('importStatus', '', false);
+          return;
+        }
+        setStatus('importStatus', '导入中…', false);
+        var out = clearNode($('importOut'));
+        try {
+          var data = await api('/v1/soul/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: text
+          });
+          if (data && isNum(data.memories)) out.appendChild(el('p', 'meta', '导入记忆 ' + fmtInt(data.memories) + ' 条'));
+          if (data && data.persona_file) out.appendChild(el('p', 'mono', String(data.persona_file)));
+          setStatus('importStatus', '已导入。', false);
+        } catch (err) {
+          showError('importStatus', '导入未完成：', err);
+        }
+      }
+
+      /* ---------------- 控件绑定 ---------------- */
+
+      function toInt(value) {
+        if (value === null || value === undefined || String(value).trim() === '') return null;
+        var n = Number(value);
+        if (!isFinite(n)) return null;
+        return Math.round(n);
+      }
+
+      function setSwitch(id, on) {
+        var node = $(id);
+        if (node) node.setAttribute('aria-checked', on ? 'true' : 'false');
+      }
+
+      function getSwitch(id) {
+        var node = $(id);
+        return !!node && node.getAttribute('aria-checked') === 'true';
+      }
+
+      function bindSwitch(id) {
+        var node = $(id);
+        if (!node) return;
+        node.addEventListener('click', function () {
+          setSwitch(id, !getSwitch(id));
+        });
+      }
+
+      /* ---------------- 工具与声音 ---------------- */
+      var ttsState = { status: null };
+
+      function renderTools(data) {
+        var t = (data && data.tools) || {};
+        var v = (data && data.voice) || {};
+        setSwitch('swTools', !!t.enabled);
+        setSwitch('swToolsGroup', !!t.group_enabled);
+        setSwitch('swWeb', !!t.web_enabled);
+        setSwitch('swVision', !!t.vision_enabled);
+        setSwitch('swTts', !!v.enabled);
+        setSwitch('swTtsSend', !!v.send_in_chat);
+        if (v.cache_enabled !== undefined) setSwitch('swTtsCache', !!v.cache_enabled);
+        if ($('visionModel')) $('visionModel').value = t.vision_model || '';
+        if ($('visionBase')) $('visionBase').value = t.vision_base_url || '';
+        if ($('toolsMock')) $('toolsMock').textContent = t.mocked ? '是（mock，工具与语音都不出网）' : '否';
+        if ($('toolsState')) {
+          var bits = [];
+          bits.push(t.enabled ? '工具已开' : '工具已关');
+          bits.push(t.group_enabled ? '群聊也调' : '群聊不调');
+          bits.push(t.vision_enabled ? '识图开' : '识图关');
+          if (t.vision_has_key) bits.push('视觉走独立 key');
+          $('toolsState').textContent = bits.join(' · ');
+        }
+        if ($('ttsBase')) $('ttsBase').value = v.base_url || '';
+        if ($('ttsVoice')) $('ttsVoice').value = v.voice || '';
+        if ($('ttsStyle')) $('ttsStyle').value = v.style || '';
+        if ($('ttsTtl')) $('ttsTtl').value = (v.cache_ttl_days === undefined ? 15 : v.cache_ttl_days);
+        if ($('ttsRate') && document.activeElement !== $('ttsRate') && !$('ttsRate').value && ttsState.status) {
+          $('ttsRate').value = ttsState.status.max_per_min;
+        }
+      }
+
+      async function loadTtsStatus() {
+        try {
+          var st = await api('/v1/console/tts');
+          ttsState.status = st;
+          if ($('ttsState')) $('ttsState').textContent = st.available ? '可用' : '不可用（' + (st.reason || '未知') + '）';
+          if ($('ttsCacheFiles')) $('ttsCacheFiles').textContent = String(st.cached_files || 0) + ' 个';
+          if ($('ttsQuota')) $('ttsQuota').textContent = st.max_per_min ? (String(st.used_this_minute || 0) + ' / ' + st.max_per_min) : '不限';
+          if ($('swTtsCache')) setSwitch('swTtsCache', st.cache_enabled !== false);
+          if ($('ttsRate') && !$('ttsRate').value && st.max_per_min !== undefined) $('ttsRate').value = st.max_per_min;
+        } catch (err) {
+          if ($('ttsState')) $('ttsState').textContent = '状态接口不可用';
+        }
+      }
+
+      async function loadTools() {
+        try {
+          var data = await api('/v1/settings');
+          renderTools(data);
+          await loadTtsStatus();
+          setStatus('toolsStatus', '', false);
+        } catch (err) {
+          setStatus('toolsStatus', err.message, true);
+        }
+      }
+
+      async function saveTools() {
+        setStatus('toolsStatus', '保存中…', false);
+        try {
+          var data = await api('/v1/settings', jsonBody({
+            tools_enabled: getSwitch('swTools'),
+            group_tools_enabled: getSwitch('swToolsGroup'),
+            web_enabled: getSwitch('swWeb'),
+            vision_enabled: getSwitch('swVision'),
+            vision_model: $('visionModel').value.trim(),
+            vision_base_url: $('visionBase').value.trim()
+          }));
+          renderTools(data);
+          setStatus('toolsStatus', '已保存：工具设置', false);
+        } catch (err) {
+          setStatus('toolsStatus', err.message, true);
+        }
+      }
+
+      async function saveVoice() {
+        var rate = toInt($('ttsRate').value);
+        var ttl = toInt($('ttsTtl').value);
+        if (rate === null || rate < 0 || rate > 60) {
+          setStatus('ttsStatus', '每分钟上限需为 0–60 的整数。', true);
+          return;
+        }
+        if (ttl === null || ttl < 0 || ttl > 365) {
+          setStatus('ttsStatus', '缓存保留天数需为 0–365 的整数。', true);
+          return;
+        }
+        setStatus('ttsStatus', '保存中…', false);
+        try {
+          var data = await api('/v1/settings', jsonBody({
+            tts_enabled: getSwitch('swTts'),
+            tts_send_in_chat: getSwitch('swTtsSend'),
+            tts_cache_enabled: getSwitch('swTtsCache'),
+            tts_cache_ttl_days: ttl,
+            tts_base_url: $('ttsBase').value.trim(),
+            tts_voice: $('ttsVoice').value.trim(),
+            tts_style: $('ttsStyle').value.trim()
+          }));
+          renderTools(data);
+          setStatus('ttsStatus', '已保存：声音设置', false);
+          loadTtsStatus();
+        } catch (err) {
+          setStatus('ttsStatus', err.message, true);
+        }
+      }
+
+      async function ttsPreview() {
+        var text = ($('ttsText').value || '').trim() || '你好呀，今天过得怎么样';
+        setStatus('ttsStatus', '合成中…', false);
+        try {
+          var res = await api('/v1/console/tts', jsonBody({ text: text }));
+          if (!res || !res.ok) {
+            setStatus('ttsStatus', '合成失败：' + ((res && res.reason) || '未知'), true);
+            return;
+          }
+          var player = $('ttsPlayer');
+          player.src = '/v1/console/tts/file?path=' + encodeURIComponent(res.path);
+          player.hidden = false;
+          var playing = player.play();
+          if (playing && playing.catch) playing.catch(function () {});
+          setStatus('ttsStatus', '已合成' + (res.cached ? '（命中缓存）' : '') + ' · ' + Math.round((res.bytes || 0) / 1024) + ' KB', false);
+          loadTtsStatus();
+        } catch (err) {
+          setStatus('ttsStatus', err.message, true);
+        }
+      }
+
+      function bindTools() {
+        ['swTools', 'swToolsGroup', 'swWeb', 'swVision', 'swTts', 'swTtsSend', 'swTtsCache'].forEach(bindSwitch);
+        $('toolsSave').addEventListener('click', saveTools);
+        $('toolsRefresh').addEventListener('click', function () { loadTools(); });
+        $('ttsSave').addEventListener('click', saveVoice);
+        $('ttsPreview').addEventListener('click', ttsPreview);
+      }
+
+      /* ---------------- 连接与账号 ---------------- */
+      var accountState = { provider: null };
+
+      function renderFamilyRoleOptions(select, current) {
+        var roles = ['生父', '干爹'];
+        if (current && roles.indexOf(current) < 0) roles = [current].concat(roles);
+        roles.forEach(function (role) {
+          var opt = document.createElement('option');
+          opt.value = role;
+          opt.textContent = role;
+          if (role === current) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+
+      function familyRow(item) {
+        var data = item || {};
+        var row = el('div', 'family-row');
+        var openid = document.createElement('input');
+        openid.type = 'text';
+        openid.inputMode = 'numeric';
+        openid.placeholder = 'QQ / openid';
+        openid.value = data.openid || '';
+        openid.setAttribute('data-field', 'openid');
+        openid.setAttribute('aria-label', '家人 QQ');
+        var role = document.createElement('select');
+        role.setAttribute('data-field', 'role');
+        role.setAttribute('aria-label', '家人角色');
+        renderFamilyRoleOptions(role, data.role || '生父');
+        var aliases = document.createElement('input');
+        aliases.type = 'text';
+        aliases.placeholder = '别名，逗号分隔';
+        aliases.value = Array.isArray(data.aliases) ? data.aliases.join('、') : (data.aliases || '');
+        aliases.setAttribute('data-field', 'aliases');
+        aliases.setAttribute('aria-label', '家人别名');
+        var del = el('button', 'btn btn--sm', '删除');
+        del.type = 'button';
+        del.addEventListener('click', function () { row.remove(); });
+        row.appendChild(openid);
+        row.appendChild(role);
+        row.appendChild(aliases);
+        row.appendChild(del);
+        return row;
+      }
+
+      function renderFamilyRows(items) {
+        var box = clearNode($('familyList'));
+        var list = Array.isArray(items) ? items : [];
+        if (!list.length) {
+          box.appendChild(el('p', 'hint', '还没有家人。点「添加家人」加一个。'));
+          return;
+        }
+        list.forEach(function (item) { box.appendChild(familyRow(item)); });
+      }
+
+      function collectFamilyRoles() {
+        var rows = $$('.family-row', $('familyList'));
+        var out = [];
+        rows.forEach(function (row) {
+          var openid = row.querySelector('[data-field="openid"]').value.trim();
+          var role = row.querySelector('[data-field="role"]').value;
+          var aliasText = row.querySelector('[data-field="aliases"]').value;
+          var aliases = aliasText.split(/[,，、;；\s]+/).map(function (part) {
+            return part.trim();
+          }).filter(function (part) { return part; });
+          if (!openid) return;   // 点了「添加」没填的行直接跳过
+          out.push({ openid: openid, role: role, aliases: aliases });
+        });
+        return out;
+      }
+
+      function renderAccount(data) {
+        var launcher = (data && data.launcher) || {};
+        var family = (data && data.family) || {};
+        var voice = (data && data.voice) || {};
+        if ($('accountQqMasked')) {
+          $('accountQqMasked').textContent = launcher.qq_set
+            ? '小号已保存：' + (launcher.qq || '已打码') + '（输入新号才覆盖，留空不改）'
+            : '还没配小号。';
+        }
+        if ($('launcherQq')) {
+          $('launcherQq').value = '';
+          $('launcherQq').placeholder = launcher.qq_set
+            ? ('已保存 ' + (launcher.qq || '') + '，留空不改')
+            : '输入小号 QQ';
+        }
+        if ($('launcherNapcatDir')) $('launcherNapcatDir').value = launcher.napcat_dir || '';
+        if ($('launcherWebuiPort')) {
+          $('launcherWebuiPort').value = launcher.webui_port ? String(launcher.webui_port) : '6099';
+          $('launcherWebuiPort').placeholder = '6099';
+        }
+        if ($('accountTtsBase')) $('accountTtsBase').textContent = voice.base_url || '—';
+        if ($('familyGodfather')) $('familyGodfather').checked = !!family.announce_godfather;
+        renderFamilyRows(family.roles);
+      }
+
+      async function loadAccountProvider() {
+        try {
+          var p = await api('/v1/settings/provider');
+          accountState.provider = p || {};
+          if ($('accountKeyMasked')) {
+            $('accountKeyMasked').textContent = p && p.has_key ? (p.key_masked || '已保存') : '未填';
+          }
+          if ($('accountProviderMeta')) {
+            $('accountProviderMeta').textContent = txt((p && p.base_url) || '') + ' · ' + txt((p && p.model) || '');
+          }
+          if ($('accountApiKey')) {
+            $('accountApiKey').value = '';
+            $('accountApiKey').placeholder = p && p.has_key ? '留空 = 不修改' : '粘贴 API Key';
+          }
+        } catch (err) {
+          showError('accountKeyStatus', '读取模型配置失败：', err);
+        }
+      }
+
+      async function saveAccountKey() {
+        var key = $('accountApiKey').value.trim();
+        var provider = accountState.provider || {};
+        if (!provider.base_url || !provider.model) {
+          setStatus('accountKeyStatus', '先在「模型」页确认端点与模型名，再来这里换 key。', true);
+          return;
+        }
+        setStatus('accountKeyStatus', '保存中…', false);
+        try {
+          var data = await api('/v1/settings/provider', jsonBody({
+            base_url: provider.base_url,
+            api_key: key,
+            model: provider.model
+          }));
+          accountState.provider = data || provider;
+          await loadAccountProvider();
+          setStatus('accountKeyStatus', '已保存，立刻生效。', false);
+        } catch (err) {
+          showError('accountKeyStatus', '保存未完成：', err);
+        }
+      }
+
+      async function loadAccount() {
+        setStatus('accountStatus', '加载中…', false);
+        try {
+          var data = await api('/v1/settings');
+          renderAccount(data);
+          setStatus('accountStatus', '', false);
+        } catch (err) {
+          loaded.account = false;
+          showError('accountStatus', '加载失败：', err);
+        }
+        loadAccountProvider();
+      }
+
+      async function saveAccount() {
+        var qqText = $('launcherQq').value.trim();
+        if (qqText && !/^\d{4,12}$/.test(qqText)) {
+          setStatus('accountStatus', '小号 QQ 只填数字。', true);
+          return;
+        }
+        var portText = $('launcherWebuiPort').value.trim();
+        var port = toInt(portText);
+        if (portText !== '' && (port === null || port < 0 || port > 65535)) {
+          setStatus('accountStatus', 'WebUI 端口需为 0–65535 的整数。', true);
+          return;
+        }
+        var roles = collectFamilyRoles();
+        for (var i = 0; i < roles.length; i += 1) {
+          if (!/^\d{4,12}$/.test(roles[i].openid)) {
+            setStatus('accountStatus', '家人 QQ 只填数字：' + roles[i].openid, true);
+            return;
+          }
+        }
+        var payload = {
+          napcat_dir: $('launcherNapcatDir').value.trim(),
+          family_roles: roles,
+          announce_godfather: $('familyGodfather').checked
+        };
+        if (qqText) payload.launcher_qq = qqText;
+        if (portText !== '' && port !== null) payload.webui_port = port;
+        setStatus('accountStatus', '保存中…', false);
+        try {
+          var data = await api('/v1/settings', jsonBody(payload));
+          renderAccount(data);
+          setStatus('accountStatus', '已保存：连接与账号', false);
+        } catch (err) {
+          showError('accountStatus', '保存未完成：', err);
+        }
+      }
+
+      function bindAccount() {
+        $('accountKeySave').addEventListener('click', saveAccountKey);
+        $('accountSave').addEventListener('click', saveAccount);
+        $('familyAdd').addEventListener('click', function () {
+          var box = $('familyList');
+          if (!$$('.family-row', box).length) clearNode(box);
+          box.appendChild(familyRow({ role: '生父', aliases: [] }));
+        });
+      }
+
+      function bindPersona() {
+        var write = document.getElementById('diaryWrite');
+        if (write) write.addEventListener('click', async function () {
+          write.disabled = true;
+          setStatus('diaryStatus', '正在补写…', false);
+          try {
+            await api('/v1/diary/run', jsonBody({}));
+            await loadDiary();
+          } catch (err) {
+            showError('diaryStatus', '补写失败：', err);
+          } finally {
+            write.disabled = false;
+          }
+        });
+        var reload = document.getElementById('diaryReload');
+        if (reload) reload.addEventListener('click', loadDiary);
+      }
+
+      function bindRelation() {
+        $('calForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          calibrate();
+        });
+      }
+
+      function bindMemory() {
+        $('memSearch').addEventListener('click', loadMemories);
+        $('memKind').addEventListener('change', loadMemories);
+        if ($('memOwner')) $('memOwner').addEventListener('change', loadMemories);
+        $('memQ').addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') { event.preventDefault(); loadMemories(); }
+        });
+        $('recallBtn').addEventListener('click', runRecall);
+        $('recallQ').addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') { event.preventDefault(); runRecall(); }
+        });
+      }
+
+      function bindSchedule() {
+        $('proForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          saveProactive();
+        });
+      }
+
+      function bindModels() {
+        $('modelForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          saveModelParams();
+        });
+        $('prefSave').addEventListener('click', savePreferences);
+        $('styleList').addEventListener('change', function (event) {
+          var target = event.target;
+          if (!target || target.name !== 'style') return;
+          selectedStyle = String(target.value);
+          markStyleSelection();
+        });
+      }
+
+      function bindSoul() {
+        $('soulExport').addEventListener('click', exportSoul);
+        $('snapNew').addEventListener('click', createSnapshot);
+        $('snapReload').addEventListener('click', loadSnapshots);
+        $('soulFile').addEventListener('change', function (event) {
+          var file = event.target.files && event.target.files[0];
+          if (file) importSoul(file);
+          event.target.value = '';
+        });
+      }
+
+      function init() {
+        $$('.tab').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+                var name = btn.getAttribute('data-tab');
+                activateTab(name);
+                try { history.replaceState(null, '', '#' + name); } catch (e) {}
+              });
+        });
+        $('reloadTab').addEventListener('click', reloadCurrent);
+        $$('.switch').forEach(function (btn) { bindSwitch(btn.id); });
+        bindRelation();
+        bindPersona();
+        bindTools();
+        bindMemory();
+        bindSchedule();
+        bindModels();
+        bindSoul();
+        bindAccount();
+        var _hash = (location.hash || '').replace('#', '');
+        activateTab(loaders[_hash] ? _hash : 'persona');
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

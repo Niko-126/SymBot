@@ -1,0 +1,42 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+*.log
+.DS_Store
+panel/.symvolve-preview/
+panel/.mock-server.mjs
+panel/.preview-*.html
+Girl-memory/
+*.key
+.env
+keys.txt
+config.local.yaml
+dist/
+build/
+*.spec
+app-window.png
+exports/
+.tmp/
+.tmp-scorer.mjs
+persona-active.yaml
+docs/.handoff-*.txt
+
+# 实跑产物（真实对话 / 场景记录，只在本机看，绝不入库）
+场景模拟-*.md
+tmp-scorer.mjs
+
+# 用户导出的私人聊天（只在本机脱敏分析，绝不入库/入包）
+Chat/
+
+# 第三方声音服务（无授权再分发，自己拉；见 scripts/fetch_voice_service.ps1）
+.third_party/
+
+# 闭源记忆内核：加密容器与打包中间目录绝不入库（源码在私有仓，见 docs/07 §7）
+# build/ 与 dist/ 第 15、16 行已有，这里只补容器本体与新增的中间目录
+build/vendor-memory/
+*.bin
+# 但**发布版必须带**加密容器：源码已删，只靠它跑（见 docs/07 §7）
+!app/memory/_vault.bin
+
+scripts/.wm.key

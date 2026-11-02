@@ -1,0 +1,196 @@
+# 衡忆数字生命（SymBot）配置示例
+#
+# 用法：复制成 `config.local.yaml` 再改（它被 .gitignore 挡住，永不上传）：
+#     copy config.example.yaml config.local.yaml
+# 优先级：环境变量 SYMEM_* > config.local.yaml > config.yaml；
+# 本文件**不参与加载**，只是给用户抄的模板。
+#
+# 本文件里所有号码、路径、key 都是占位符。真实 QQ / 私人路径 / api_key
+# 只写你自己的 config.local.yaml，别写进仓库里的任何文件。
+
+# ------------------------------------------------------------------ 服务
+server:
+  host: 127.0.0.1          # 只监听本机；面板也走它
+  port: 8787
+
+# ------------------------------------------------------------------ 模型
+provider:
+  # OpenAI 兼容端点。默认硅基流动；换官方 DeepSeek 就改 base_url + model
+  base_url: https://api.siliconflow.cn/v1
+  api_key: ""              # 你的 key；留空 = mock 模式（本地模拟，零联网也能跑通面板）
+  model: deepseek-ai/DeepSeek-V4.1-Flash
+  small_model: ""          # 摘要/记忆抽取用的小模型；留空 = 跟主模型一样
+  force_model: ""          # 非空 = 所有任务强制走它（不走风格路由）
+  temperature: 0.85
+  max_tokens: 400
+  timeout_s: 60.0
+
+# ------------------------------------------------------------------ 上下文
+context:
+  window: 64000            # 模型上下文窗口（按你选的模型改）
+  reserve_output: 1024
+  warn_ratio: 0.55         # mode=ratio 时的水位线
+  force_ratio: 0.75
+  hard_ratio: 0.90
+  mode: budget             # budget = 固定预算（推荐）；ratio = 按窗口比例
+  budget: 6000             # 工作集目标 tokens
+  trigger: 5000            # 超过就压缩
+  hard_cap: 8000           # 超过就降级
+  keep_recent: 12          # 永远保留原文的轮数
+  verbatim_max: 30         # 未压缩原文上限（超过就折成线索）
+  degrade: false           # 降级模式：默认关，触顶后才开
+
+# ------------------------------------------------------------------ 存储
+store:
+  db_path: data/life.db    # 相对路径按数据根目录算（默认就是仓库根）
+  media_dir: data/media
+
+# ------------------------------------------------------------------ 人设
+persona:
+  path: persona/whale-girl.yaml
+
+# ------------------------------------------------------------------ 生活
+life:
+  timezone: Asia/Shanghai
+
+# ------------------------------------------------------------------ 开发者
+# 只有打开时才能手动设定好感、强制新建会话；口令留空 = 开发者接口全部 403。
+developer:
+  enabled: true
+  key: ""                  # 本机自用口令；公开仓库不预置
+  logo_taps: 12
+
+# ------------------------------------------------------------------ 热梗
+trend:
+  harvest_enabled: false   # 每天抓一轮 B 站热梗；mock / 无 key 时永远跳过
+  interval_hours: 24
+  limit: 20
+
+# ------------------------------------------------------------------ 工具
+# mock 或 tools.enabled=false 时永不出网（测试零联网、零花费）。
+tools:
+  enabled: true
+  group_enabled: false     # 群聊里也调工具？默认关（人多容易烧钱）
+  web:
+    enabled: true
+    max_results: 5
+    timeout_s: 8.0
+    max_chars: 1500        # 抓回来的正文截断长度
+    allow_hosts: []        # 空 = 不限制；填了就只允许这些域名（含子域）
+  vision:
+    enabled: true
+    base_url: ""           # 留空 = 跟 provider 同端点
+    api_key: ""            # 留空 = 跟 provider 同 key
+    model: ""              # 留空 = 跟 provider.model 一致；看图建议显式指定
+    max_tokens: 400
+    timeout_s: 20.0
+    max_images: 2
+
+# ------------------------------------------------------------------ 语音（TTS）
+# 对接本地「声音服务」（与肥鱼声音插件同一套 HTTP 契约）；服务本身不随仓库分发。
+voice:
+  enabled: false
+  base_url: http://127.0.0.1:9880
+  api_key: ""
+  voice: feiyu
+  style: cute              # cute / gentle
+  timeout_s: 60.0
+  max_chars: 200
+  send_in_chat: false      # 合成完直接发进聊天（仅 OneBot 通道）
+  cache_enabled: true
+  max_per_min: 6           # 每分钟最多合成几条（0 = 不限）
+  workers: 2               # 合成线程池大小（1–4）
+  cache_ttl_days: 15       # 缓存保留天数（0 = 永不清理）
+  ask_every: 3             # 每发几条语音问一句"还要听吗"
+  streak_limit: 4          # 连发几条就喊累、退回文字
+  idle_reset_min: 30
+  cover_enabled: true      # 点歌翻唱（点歌 → 搜歌 → 换声 → 发回）
+  cover_ack: "我先练一下。"
+  cover_max_wait_s: 240
+
+# ------------------------------------------------------------------ 亲密模块
+# enabled=false = 整块关闭（也等于禁用 app/intimacy/r18/ 插件）；
+# 其余是安全阀与分级上限，默认值按"最保守也可用"给。
+intimacy:
+  enabled: true
+  non_lover_deflect: true
+  kinship_block: true      # 家人永不进入
+  minor_block: true
+  safeword: true
+  aftercare: true
+  group_max_stage: 2
+  private_max_stage: 5
+  max_consecutive_explicit: 2
+  sensory_check: true
+
+# ------------------------------------------------------------------ QQ 官方 bot
+# 开放平台机器人（qq-group 分支用）；凭据只写 config.local.yaml。
+qq:
+  enabled: false
+  auto_start: true
+  appid: ""                # 开放平台 AppID（占位）
+  token: ""                # 开放平台 Token/Secret（占位）
+  sandbox: true
+  group_at_only: true
+
+# ------------------------------------------------------------------ OneBot v11
+# NapCat / LLOneBot / Lagrange 都走这套：账号登录在 NapCat 里，这里只连 HTTP API。
+onebot:
+  enabled: false
+  api_base: http://127.0.0.1:3000
+  access_token: ""
+  self_id: "123456789"     # 小号 QQ（占位）
+  group_at_only: true
+  timeout_s: 10.0
+  ignore_ids: []           # 这些 QQ 的消息不当人处理（另一个 bot 之类）
+  mention_keywords:
+    - 小鲸鱼
+    - 大肥鱼
+    - 鲸鱼娘
+    - 小鲸
+  sticker_chance: 0.45
+  voice_chance: 0.15
+  auto_accept_friend_request: true
+  proactive_push: false    # 按用户主动消息外发（默认关）
+  proactive_interval_min: 5
+
+# ------------------------------------------------------------------ 控制台
+# token 留空 = 不校验（靠服务只监听 127.0.0.1 兜着）；填了就必须带 X-Console-Token。
+console:
+  token: ""
+
+# ------------------------------------------------------------------ 关系
+relationship:
+  lover:
+    enabled: true
+    threshold: 80.0        # 表白的最低好感
+    cooldown_days: 7       # 分手复合冷却
+    min_days: 3            # 认识够久才接受表白
+    ask_public: true       # 绑定后问一句"要不要公开"
+  caps:
+    enabled: false         # 每日关系变化上限：内部小群默认关闭（不限）
+    daily_pos: 5.0
+    daily_neg: -8.0
+
+# ------------------------------------------------------------------ 启动器 / NapCat
+# 桌面快捷方式「启动小鲸」与面板「服务控制」用；私人信息，只写 config.local.yaml。
+# 优先级：环境变量 NAPCAT_DIR / SYMEM_QQ > 这里。
+launcher:
+  qq: "123456789"          # 小号 QQ（占位）；留空 = 不快速登录
+  napcat_dir: 'C:\path\to\NapCat'   # NapCat-Shell 根目录（里面有 launcher.bat）
+  webui_port: 6099         # NapCat WebUI 端口；0 = 先读 webui.json，再退回 6099
+
+# ------------------------------------------------------------------ 家人
+# 谁算家人：这些人在聊天里永远不会进恋爱线，她处对象/认错时也会通知他们。
+# 面板「设置 → 连接与账号」写的就是这一段（同时同步 db kv `family_roles`）。
+# 每项：openid（QQ 号）/ role（生父、干爹）/ aliases（昵称别名，改号改名也认）。
+family:
+  roles:
+    - openid: "123456789"
+      role: 生父
+      aliases: ["老爸", "爸爸"]
+    - openid: "987654321"
+      role: 干爹
+      aliases: ["干爹"]
+  father_roles: ["生父"]   # 默认要通知哪些角色
+  announce_godfather: false  # 干爹也通知？（kv `announce_to_godfather` 优先）

@@ -1,0 +1,154 @@
+/* ============================================================
+   Symvolve v4 · 组件层（paper 浅色）
+   只补 tokens 里没有的"用法"：卡片阴影、品牌渐变主按钮、Σ 字标、
+   首屏签名动效、静态/降级模式。页面自己的布局仍然写在各自的 <style> 里，
+   这里不加 !important，也不改任何既有类。
+
+   动效选型：code-animation-prompts · M6「苹果发布会风」（文字参考，无静帧）
+   —— 柔和/白/亮蓝/玻璃，镜头进来时已经在动。首屏只做两件事：
+   Σ 字标上扫过一道 signal→azure 的光带（一次，1.1s），空态卡片按 70ms 阶梯发牌。
+   M6 明确"不要紫色"，所以首屏只用 --sv-gradient-brand-2，不用三段版。
+   ============================================================ */
+
+/* ---------- 品牌字标 ---------- */
+.sv-sigma {
+  font-family: var(--sv-font-en-display);
+  font-weight: var(--sv-weight-medium);
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  background: var(--sv-gradient-brand-2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  user-select: none;
+}
+
+.sv-wordmark {
+  font-family: var(--sv-font-en-display);
+  font-weight: var(--sv-weight-medium);
+  letter-spacing: var(--sv-tracking-wordmark);
+}
+
+/* ---------- 卡片三级阴影 ---------- */
+.sv-card {
+  background: var(--sv-surface-raised);
+  border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+  border-radius: var(--sv-radius-xl);
+  box-shadow: var(--sv-shadow-1);
+}
+.sv-card--raised {
+  box-shadow: var(--sv-shadow-2);
+}
+.sv-card--float {
+  box-shadow: var(--sv-shadow-3);
+}
+
+/* ---------- 主行动按钮：品牌渐变 ---------- */
+.sv-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sv-space-8);
+  min-height: 38px;
+  padding: 0 var(--sv-space-16);
+  border: 0;
+  border-radius: var(--sv-radius-full);
+  background: var(--sv-gradient-brand-2);
+  color: #FFFFFF;
+  font-size: var(--sv-text-caption);
+  font-weight: var(--sv-weight-medium);
+  cursor: pointer;
+  box-shadow: var(--sv-shadow-2);
+  transition: transform var(--sv-duration-micro) var(--sv-ease-standard),
+              box-shadow var(--sv-duration-state) var(--sv-ease-standard),
+              filter var(--sv-duration-micro) var(--sv-ease-standard);
+}
+.sv-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--sv-shadow-3);
+  filter: saturate(1.06);
+}
+.sv-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--sv-shadow-1);
+}
+.sv-btn-primary:focus-visible {
+  outline: var(--sv-border-width-strong) solid var(--sv-focus-ring);
+  outline-offset: var(--sv-border-width-strong);
+}
+.sv-btn-primary:disabled {
+  background: var(--sv-disabled-border);
+  color: var(--sv-text-secondary);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- 首屏签名动效 1/2：Σ 光带扫过（只播一次） ---------- */
+@keyframes sv-sweep {
+  0%   { transform: translateX(-130%) skewX(-14deg); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateX(260%) skewX(-14deg); opacity: 0; }
+}
+.sv-scan {
+  position: relative;
+  overflow: hidden;
+}
+.sv-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 34%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(61 139 255 / 20%) 55%,
+    transparent 100%
+  );
+  animation: sv-sweep 1100ms var(--sv-ease-standard) 120ms 1 both;
+}
+
+/* ---------- 首屏签名动效 2/2：卡片发牌 ---------- */
+@keyframes sv-deal {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.sv-deal {
+  animation: sv-deal var(--sv-duration-scene) var(--sv-ease-standard) both;
+  animation-delay: calc(var(--sv-i, 0) * 70ms);
+}
+
+/* ---------- 静态 / 降级 ---------- */
+html.sv-static .sv-scan::after,
+html.sv-static .sv-deal {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+html.sv-static .sv-btn-primary {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sv-scan::after,
+  .sv-deal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .sv-btn-primary {
+    transition: none !important;
+  }
+}
+
+/* ---------- 打印：一律冻结 ---------- */
+@media print {
+  .sv-scan::after,
+  .sv-deal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

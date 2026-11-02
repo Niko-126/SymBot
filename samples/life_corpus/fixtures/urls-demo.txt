@@ -1,0 +1,5 @@
+# 采集示例 URL 列表（dry-run 用，不会真的联网）
+# 一行一条；# 开头与空行忽略；只支持 http / https。
+http://example.com/daily-life/one
+https://example.com/daily-life/two
+http://example.org/weekend

@@ -1,0 +1,2 @@
+{"id":"scene_workday_lunch_01","kind":"social_scene","day_type":"workday","relation":"colleague","setting":"restaurant","participants":3,"turns":8,"initiator":"other","interrupt_policy":"defer","topic":"午饭时聊周末安排","outcome":"约好周六下午一起打球","synthetic":true,"note":"合成样本：同事临时约饭"}
+{"id":"scene_restday_family_01","kind":"social_scene","day_type":"restday","relation":"family","setting":"home","participants":3,"turns":10,"initiator":"self","interrupt_policy":"allow","topic":"晚饭吃什么、谁去买菜","outcome":"决定点外卖，让家里人去取","synthetic":true,"note":"合成样本：家庭日常协商"}

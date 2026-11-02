@@ -1,0 +1,10 @@
+{
+  "id": "hello",
+  "name": "示例模块 · 你好",
+  "version": "1.0.0",
+  "entry": "hello.py",
+  "kind": "mixed",
+  "requires": [],
+  "author": "SymBot",
+  "description": "验收用：注册一个 hello_ping 工具和一个 /v1/modules/hello/ping 路由。"
+}
