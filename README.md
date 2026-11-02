@@ -2,6 +2,10 @@
 
 > 仓库：https://github.com/Niko-126/SymBot ｜ 版本：SymBot 0.1.0
 
+
+> ⚠️ **前端 UI 目前处于测试阶段**：页面可能仍有 BUG 或视觉不理想的地方。
+> 欢迎到 [Issues](https://github.com/Niko-126/SymBot/issues) 反馈，一起把它打磨好。
+
 > 一个**住在你电脑里**的对话智能体：有记忆、有关系、有作息、有脾气，换模型 / 换机器 / 换聊天平台，
 > 她还是她。
 
