@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="780" viewBox="0 0 720 780" role="img" aria-label="五家能力雷达图">
+<rect width="720" height="780" fill="#F2F2EF"/>
+<text x="40" y="56" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="24" fill="#0B0C0E" font-weight="700" text-anchor="start">五家能力对比（8 个关键维度）</text>
+<text x="40" y="84" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#9AA0A6" font-weight="400" text-anchor="start">满分 10 分，由同一套评测标准、同一模型跑出</text>
+<polygon points="360.0,330.0 395.4,344.6 410.0,380.0 395.4,415.4 360.0,430.0 324.6,415.4 310.0,380.0 324.6,344.6" fill="none" stroke="#E4E4DE" stroke-width="1"/>
+<polygon points="360.0,280.0 430.7,309.3 460.0,380.0 430.7,450.7 360.0,480.0 289.3,450.7 260.0,380.0 289.3,309.3" fill="none" stroke="#E4E4DE" stroke-width="1"/>
+<polygon points="360.0,230.0 466.1,273.9 510.0,380.0 466.1,486.1 360.0,530.0 253.9,486.1 210.0,380.0 253.9,273.9" fill="none" stroke="#E4E4DE" stroke-width="1"/>
+<polygon points="360.0,180.0 501.4,238.6 560.0,380.0 501.4,521.4 360.0,580.0 218.6,521.4 160.0,380.0 218.6,238.6" fill="none" stroke="#E4E4DE" stroke-width="1"/>
+<line x1="360" y1="380" x2="360.0" y2="180.0" stroke="#E4E4DE" stroke-width="1"/>
+<text x="360.0" y="151.0" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">记忆</text>
+<line x1="360" y1="380" x2="501.4213562373095" y2="238.5786437626905" stroke="#E4E4DE" stroke-width="1"/>
+<text x="525.4629867976521" y="219.53701320234788" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">关系</text>
+<line x1="360" y1="380" x2="560.0" y2="380.0" stroke="#E4E4DE" stroke-width="1"/>
+<text x="594.0" y="385.0" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">主动</text>
+<line x1="360" y1="380" x2="501.4213562373095" y2="521.4213562373095" stroke="#E4E4DE" stroke-width="1"/>
+<text x="525.4629867976521" y="550.4629867976521" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">平台</text>
+<line x1="360" y1="380" x2="360.0" y2="580.0" stroke="#E4E4DE" stroke-width="1"/>
+<text x="360.0" y="619.0" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">工具</text>
+<line x1="360" y1="380" x2="218.57864376269052" y2="521.4213562373095" stroke="#E4E4DE" stroke-width="1"/>
+<text x="194.5370132023479" y="550.4629867976521" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">语音</text>
+<line x1="360" y1="380" x2="160.0" y2="380.0" stroke="#E4E4DE" stroke-width="1"/>
+<text x="126.0" y="385.00000000000006" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">面板</text>
+<line x1="360" y1="380" x2="218.57864376269046" y2="238.57864376269052" stroke="#E4E4DE" stroke-width="1"/>
+<text x="194.53701320234785" y="219.5370132023479" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#0B0C0E" font-weight="700" text-anchor="middle">隐私</text>
+<polygon points="360.0,200.0 473.1,266.9 520.0,380.0 402.4,422.4 360.0,460.0 275.1,464.9 200.0,380.0 275.1,295.1" fill="#00E0C6" fill-opacity="0.10" stroke="#00E0C6" stroke-opacity="1" stroke-width="3"/>
+<polygon points="360.0,320.0 360.0,380.0 480.0,380.0 501.4,521.4 360.0,560.0 232.7,507.3 180.0,380.0 275.1,295.1" fill="#3D3F45" fill-opacity="0.10" stroke="#3D3F45" stroke-opacity="0.75" stroke-width="2"/>
+<polygon points="360.0,240.0 402.4,337.6 520.0,380.0 416.6,436.6 360.0,540.0 261.0,479.0 200.0,380.0 246.9,266.9" fill="#9AA0A6" fill-opacity="0.10" stroke="#9AA0A6" stroke-opacity="0.75" stroke-width="2"/>
+<polygon points="360.0,280.0 402.4,337.6 480.0,380.0 402.4,422.4 360.0,540.0 303.4,436.6 220.0,380.0 246.9,266.9" fill="#C9CCC9" fill-opacity="0.10" stroke="#C9CCC9" stroke-opacity="0.75" stroke-width="2"/>
+<rect x="40" y="724" width="24" height="4" rx="2" fill="#00E0C6"/>
+<text x="72" y="734" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#0B0C0E" font-weight="700" text-anchor="start">SymBot-Full</text>
+<rect x="210" y="724" width="24" height="4" rx="2" fill="#3D3F45"/>
+<text x="242" y="734" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#6B7178" font-weight="400" text-anchor="start">AstrBot</text>
+<rect x="380" y="724" width="24" height="4" rx="2" fill="#9AA0A6"/>
+<text x="412" y="734" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#6B7178" font-weight="400" text-anchor="start">surfcore</text>
+<rect x="550" y="724" width="24" height="4" rx="2" fill="#C9CCC9"/>
+<text x="582" y="734" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#6B7178" font-weight="400" text-anchor="start">qq-bridge</text>
+</svg>

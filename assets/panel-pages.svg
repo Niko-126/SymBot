@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380" role="img" aria-label="面板五页各管什么">
+<rect width="900" height="380" fill="#F2F2EF"/>
+<text x="40" y="56" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="26" fill="#0B0C0E" font-weight="700" text-anchor="start">一个窗口，五个页面</text>
+<text x="40" y="84" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="14" fill="#9AA0A6" font-weight="400" text-anchor="start">浏览器打开，不用额外装东西</text>
+<rect x="40" y="116" width="256" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="60" y="150" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="17" fill="#0B0C0E" font-weight="700" text-anchor="start">对话</text>
+<text x="60" y="174" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#9AA0A6" font-weight="400" text-anchor="start">/</text>
+<text x="60" y="198" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">聊天、看她此刻状态</text>
+<rect x="320" y="116" width="256" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="340" y="150" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="17" fill="#0B0C0E" font-weight="700" text-anchor="start">控制台</text>
+<text x="340" y="174" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#9AA0A6" font-weight="400" text-anchor="start">/console.html</text>
+<text x="340" y="198" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">好友与关系、记忆、服务开关</text>
+<rect x="600" y="116" width="256" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="620" y="150" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="17" fill="#0B0C0E" font-weight="700" text-anchor="start">设置</text>
+<text x="620" y="174" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#9AA0A6" font-weight="400" text-anchor="start">/settings.html</text>
+<text x="620" y="198" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">模型 key、小号、语音、工具</text>
+<rect x="40" y="234" width="256" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="60" y="268" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="17" fill="#0B0C0E" font-weight="700" text-anchor="start">人设卡</text>
+<text x="60" y="292" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#9AA0A6" font-weight="400" text-anchor="start">/persona.html</text>
+<text x="60" y="316" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">性格、称呼、禁区，实时预览</text>
+<rect x="320" y="234" width="256" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="340" y="268" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="17" fill="#0B0C0E" font-weight="700" text-anchor="start">热梗</text>
+<text x="340" y="292" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#9AA0A6" font-weight="400" text-anchor="start">/trend.html</text>
+<text x="340" y="316" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">给她的谈资，可关</text>
+<rect x="600" y="234" width="256" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<text x="620" y="268" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="17" fill="#0B0C0E" font-weight="700" text-anchor="start">服务抽屉</text>
+<text x="620" y="292" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="11" fill="#9AA0A6" font-weight="400" text-anchor="start">右上角</text>
+<text x="620" y="316" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="12" fill="#6B7178" font-weight="400" text-anchor="start">内核 / NapCat / 语音 / 模块，启停与日志</text>
+</svg>

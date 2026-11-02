@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="250" viewBox="0 0 760 250" role="img" aria-label="镜衡万象 Symvolve 字标">
+<rect width="760" height="250" fill="#F2F2EF"/>
+<rect x="24" y="24" width="712" height="202" rx="24" ry="24" fill="#FFFFFF" stroke="#E4E4DE" stroke-width="1"/>
+<rect x="56" y="54" width="112" height="112" rx="26" ry="26" fill="#F2F2EF" stroke="#E4E4DE" stroke-width="1"/>
+<path d="M 84 84 L 140 84 L 104 110 L 140 136 L 84 136" fill="none" stroke="#0B0C0E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="198" y="108" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="44" fill="#0B0C0E" font-weight="700" text-anchor="start">镜衡万象</text>
+<text x="200" y="144" font-family="'Cascadia Mono',Consolas,ui-monospace,monospace" font-size="14" fill="#9AA0A6" font-weight="400" text-anchor="start" letter-spacing="3">SYM  ·  BOT</text>
+<line x1="56" y1="190" x2="704" y2="190" stroke="#E4E4DE" stroke-width="1"/>
+<text x="56" y="214" font-family="'Microsoft YaHei UI','PingFang SC','Hiragino Sans GB',system-ui,sans-serif" font-size="13" fill="#6B7178" font-weight="400" text-anchor="start">镜照万变 · 衡守其一 —— 她住在你电脑里</text>
+</svg>
