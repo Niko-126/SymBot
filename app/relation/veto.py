@@ -117,7 +117,7 @@ async def veto(rt: Any, cfg: Any, *, father_uid: int, reason: str = "", dry_run:
         if not text or not base or not openid:
             return False
         try:
-            async with httpx.AsyncClient(timeout=20) as client:
+            async with httpx.AsyncClient(trust_env=False, timeout=20) as client:
                 resp = await client.post(
                     f"{base}/send_private_msg",
                     json={"user_id": int(openid), "message": [{"type": "text", "data": {"text": text}}]},
@@ -192,7 +192,7 @@ async def veto(rt: Any, cfg: Any, *, father_uid: int, reason: str = "", dry_run:
 
 async def _send_to(base: str, headers: dict, openid: str, text: str) -> bool:
     try:
-        async with httpx.AsyncClient(timeout=20) as client:
+        async with httpx.AsyncClient(trust_env=False, timeout=20) as client:
             resp = await client.post(
                 f"{base}/send_private_msg",
                 json={"user_id": int(openid), "message": [{"type": "text", "data": {"text": text}}]},

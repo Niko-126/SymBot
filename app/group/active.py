@@ -32,7 +32,7 @@ async def _send_group(group_id: Any, text: str) -> bool:
     base = str(cfg.api_base).rstrip("/")
     headers = {"Authorization": f"Bearer {cfg.access_token}"} if cfg.access_token else {}
     try:
-        async with httpx.AsyncClient(timeout=20) as client:
+        async with httpx.AsyncClient(trust_env=False, timeout=20) as client:
             r = await client.post(
                 f"{base}/send_group_msg",
                 json={"group_id": group_id, "message": [{"type": "text", "data": {"text": text}}]},

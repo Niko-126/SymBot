@@ -23,8 +23,8 @@ INTRO_SYSTEM = """你要在群里做个自我介绍。第一人称，像一个�
 """
 
 INTRO_HINTS = """群里现在有：
-- 生父 阿爸（你爹，创造你的人）
-- 干爹 阿叔（你爹的兄弟）
+- 生父 星辰（你爹，创造你的人）
+- 干爹 霜小落（你爹的兄弟）
 会有些别的群友。
 介绍时说清楚你可以：聊天、记得住人说过的事、被叫名字会应、会发点表情包、
 能搜 B 站视频发给他们、会写自己的日记和想法。
@@ -86,7 +86,7 @@ async def send_intro(rt, persona, group_id: Any = None, mention_all: bool = True
 
     ok = False
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with httpx.AsyncClient(trust_env=False, timeout=30) as client:
             r = await client.post(
                 f"{base}/send_group_msg",
                 json={"group_id": group_id, "message": segments},

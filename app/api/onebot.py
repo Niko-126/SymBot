@@ -332,7 +332,7 @@ async def _post_api(cfg, api: str, payload: dict[str, Any],
         # 传文件（upload_group_file / upload_private_file）比发消息慢得多，
         # 用默认的 10 秒会超时——超时被吞掉，表现就是"语音条发了、文件没发"。
         wait = float(timeout if timeout is not None else (cfg.timeout_s or 10))
-        async with httpx.AsyncClient(timeout=wait) as client:
+        async with httpx.AsyncClient(trust_env=False, timeout=wait) as client:
             resp = await client.post(url, json=payload, headers=headers)
             if not resp.is_success:
                 return None

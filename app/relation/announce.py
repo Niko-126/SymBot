@@ -121,7 +121,7 @@ async def compose(rt: Any, event: str, father: dict[str, Any], *,
 
 
 async def _send_private(base: str, headers: dict, openid: str, text: str) -> bool:
-    async with httpx.AsyncClient(timeout=20) as client:
+    async with httpx.AsyncClient(trust_env=False, timeout=20) as client:
         resp = await client.post(
             f"{base}/send_private_msg",
             json={"user_id": int(openid), "message": [{"type": "text", "data": {"text": text}}]},
@@ -138,7 +138,7 @@ async def _send_via_group(base: str, headers: dict, openid: str, text: str) -> b
     「发送失败，请先添加对方为好友」；但他和她在同一个群里，@ 一下也能把话说清楚。
     """
     try:
-        async with httpx.AsyncClient(timeout=25) as client:
+        async with httpx.AsyncClient(trust_env=False, timeout=25) as client:
             groups = await client.post(f"{base}/get_group_list", json={}, headers=headers)
             gdata = groups.json() if groups.is_success else {}
             for g in (gdata.get("data") or []):

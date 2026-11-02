@@ -51,7 +51,7 @@ async def _qq_send(payload: dict[str, Any], api: str = "send_private_msg") -> bo
     base, token = _send_api()
     headers = {"Authorization": f"Bearer {token}"} if token else {}
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with httpx.AsyncClient(trust_env=False, timeout=30) as client:
             r = await client.post(f"{base}/{api}", json=payload, headers=headers)
             if not r.is_success:
                 return False
