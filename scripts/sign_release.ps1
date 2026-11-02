@@ -1,4 +1,4 @@
-# 给 Releases 里的 exe 签名：证书 / 时间戳 / 校验 / 重算 SHA256SUMS
+﻿# 给 Releases 里的 exe 签名：证书 / 时间戳 / 校验 / 重算 SHA256SUMS
 #
 # 用法：
 #   .\scripts\sign_release.ps1 -WhatIf                        # 只看环境，不签
@@ -9,7 +9,7 @@
 # 系统自带、不依赖 Windows SDK；签名效果与 signtool 等价（同一套 Authenticode）。
 # 某些硬件令牌驱动要求走 signtool，加 -UseSignTool 即可（需要已安装 SDK）。
 
-[CmdletBinding(SupportsShouldProcess = $true)]
+[CmdletBinding()]
 param(
     [string]$Dir = "C:\AIGCProgram\GitHub\Releases\v0.1.0",
     [string]$Thumbprint = "",
