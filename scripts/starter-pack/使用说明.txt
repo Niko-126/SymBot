@@ -1,0 +1,48 @@
+ai-life v0.1.0 · 内部测试分发包（Windows x64）
+====================================================
+
+本包已内置内部测试 API Key，解压即用，不需要自己填 Key。
+仅限内部开发组测试，请不要外发压缩包、不要把 Key 贴到公开地方。
+
+一、启动
+1. 解压到任意可写目录（不要放 C:\Program Files，那里写不了数据）
+2. 双击「启动.bat」（或进入 ai-life 目录双击 ai-life.exe）
+3. 首次启动会在 ai-life\data\ 创建对话与记忆数据库
+4. 窗口右上角「设置 → 完整设置」可以看到六个页签：人物 / 关系 / 记忆 / 日程 / 模型 / 灵魂
+
+二、验证 API 接口
+双击「验证接口.bat」。它会：
+  - 用 8799 端口起一个临时内核（不碰你正在用的 8787）
+  - 用临时数据目录，不污染你的聊天记录
+  - 逐个检查接口，打印 PASS / FAIL，最后自动关掉临时内核
+
+想手动看接口文档：启动后浏览器打开 http://127.0.0.1:8787/v1/docs
+
+三、接口一览（内核默认 127.0.0.1:8787）
+GET   /v1/health              健康检查（provider=openai 表示已接真模型）
+GET   /v1/board               面板首屏状态
+POST  /v1/chat                对话 {"text":"在吗"}
+GET   /v1/persona             人物设定、人格向量、原话
+GET   /v1/settings/models     模型、风格、用量
+GET   /v1/schedule            作息与主动消息设置
+GET   /v1/diary               她的一天日记
+GET   /v1/soul/snapshots      灵魂快照列表
+GET   /settings.html          设置页
+GET   /                       聊天面板
+GET   /v1/docs                OpenAPI 文档
+
+四、常见问题
+- 端口 8787 被占用：先关掉重复实例；或命令行运行 ai-life.exe --port 8790
+- 只想开接口不开窗口：ai-life.exe --no-gui --port 8787（日志在 ai-life\data\app.log）
+- 想换模型/改 Key：窗口右上角「设置 → 完整设置 → 模型」
+- 数据都在本机 ai-life\data\，不上传；备份迁移用设置页「灵魂」导出
+- 测试结束统一吊销内置 Key，届时旧包会失效
+- 如果聊天一直报错（HTTP 500），先双击「验证接口.bat」：chat 一项 FAIL 且其他 PASS，
+  基本是内置 Key 余额用尽，找管理员换新包
+
+五、这个包里有什么
+ai-life\            可运行目录（含 Python 运行时与全部依赖，无需安装环境）
+ai-life\config.local.yaml   内置测试 Key 与模型配置
+启动.bat            启动桌面窗口
+verify-api.ps1      接口自检脚本（由「验证接口.bat」调用）
+使用说明.txt        本文件

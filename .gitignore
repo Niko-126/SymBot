@@ -1,0 +1,44 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+*.log
+.DS_Store
+panel/.symvolve-preview/
+panel/.mock-server.mjs
+panel/.preview-*.html
+Girl-memory/
+*.key
+.env
+keys.txt
+config.local.yaml
+dist/
+build/
+*.spec
+app-window.png
+exports/
+.tmp/
+.tmp-scorer.mjs
+persona-active.yaml
+docs/.handoff-*.txt
+
+# 实跑产物（真实对话 / 场景记录，只在本机看，绝不入库）
+场景模拟-*.md
+tmp-scorer.mjs
+
+# 用户导出的私人聊天（只在本机脱敏分析，绝不入库/入包）
+Chat/
+
+# 第三方声音服务（无授权再分发，自己拉；见 scripts/fetch_voice_service.ps1）
+.third_party/
+
+# 打包中间产物
+build/vendor-memory/
+*.bin
+# 运行时容器要随发布版一起带
+!app/memory/_vault.bin
+
+# Electron 打包中间产物（内核 exe / 素材 seed 很大，不入库）
+desktop/resources/
+desktop/dist/
+desktop/node_modules/

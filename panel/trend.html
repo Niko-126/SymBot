@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="zh-CN" data-symvolve-scaffold="dashboard">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>热梗库 · 小鲸 · 衡忆</title>
+  <link rel="stylesheet" href="./symvolve-tokens.css">
+<link rel="stylesheet" href="./symvolve.css">
+  <script src="./symvolve-components.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background: var(--sv-surface-canvas);
+      color: var(--sv-text-primary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-body-m);
+      line-height: var(--sv-leading-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    [hidden] { display: none !important; }
+    h1, h2, h3, p, ul, ol, dl, dd, dt, figure { margin: 0; }
+    ul, ol { list-style: none; padding: 0; }
+    button, input, textarea, select { font: inherit; }
+    img { border: 0; }
+    a { color: var(--sv-text-primary); text-decoration: underline; text-underline-offset: calc(var(--sv-space-4) / 2); }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+      outline: var(--sv-border-width-strong) solid var(--sv-focus-ring);
+      outline-offset: var(--sv-border-width-strong);
+    }
+    ::selection { background: var(--sv-selection-background); color: var(--sv-selection-text); }
+    * { scrollbar-width: thin; scrollbar-color: var(--sv-border-divider) transparent; }
+    ::-webkit-scrollbar { width: var(--sv-space-8); height: var(--sv-space-8); }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--sv-border-divider); }
+
+    .mono { font-family: var(--sv-font-mono); font-variant-numeric: tabular-nums; letter-spacing: var(--sv-tracking-codename); }
+    .hint, .meta { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    /* ---------- 壳：顶栏 + 上下两区 ---------- */
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: var(--sv-space-16);
+      min-height: var(--sv-space-64);
+      padding: 0 var(--sv-space-24);
+      background: var(--sv-surface-canvas);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+    }
+    .brand { display: flex; align-items: center; gap: var(--sv-space-12); min-width: 0; }
+    .mark-img {
+      display: block;
+      width: 22px;
+      height: 22px;
+      flex: none;
+      border-radius: var(--sv-radius-full);
+      object-fit: cover;
+      border: var(--sv-border-width-thin) solid var(--sv-border-divider);
+    }
+    .brand-zh { font-size: var(--sv-text-body-m); font-weight: var(--sv-weight-medium); letter-spacing: var(--sv-tracking-wordmark); }
+    .brand-en { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); text-decoration: none; }
+    .brand-rule { width: var(--sv-border-width-thin); height: var(--sv-space-12); background: var(--sv-border-divider); }
+    .page-name { font-size: var(--sv-text-caption); color: var(--sv-text-secondary); }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: var(--sv-space-16); }
+
+    .main {
+      flex: 1;
+      display: grid;
+      gap: 0;
+      padding: 0 var(--sv-space-24) var(--sv-space-48);
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .section { padding-top: var(--sv-space-24); }
+    .section + .section { margin-top: var(--sv-space-24); border-top: var(--sv-border-width-thin) solid var(--sv-border-hairline); }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: var(--sv-space-12);
+      margin-bottom: var(--sv-space-16);
+    }
+    .section-title { font-size: var(--sv-text-heading-m); font-weight: var(--sv-weight-medium); letter-spacing: var(--sv-tracking-wordmark); line-height: var(--sv-leading-heading); }
+    .section-sub { font-size: var(--sv-text-caption); color: var(--sv-text-secondary); }
+    .section-head-right { margin-left: auto; display: flex; align-items: center; gap: var(--sv-space-8); }
+
+    /* ---------- 控件 ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sv-space-4);
+      height: var(--sv-space-32);
+      padding: 0 var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-sm);
+      background: transparent;
+      color: var(--sv-text-primary);
+      font-size: var(--sv-text-caption);
+      font-family: var(--sv-font-zh);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--sv-surface-sunken); border-color: var(--sv-border-strong); }
+    .btn:disabled { background: var(--sv-disabled-surface); border-color: var(--sv-disabled-border); color: var(--sv-disabled-text); cursor: not-allowed; }
+    .btn--sm { height: var(--sv-space-24); padding: 0 var(--sv-space-8); font-size: var(--sv-text-micro); }
+    .btn--quiet { border-color: transparent; color: var(--sv-text-secondary); }
+    .btn--quiet:hover { border-color: var(--sv-border-control); color: var(--sv-text-primary); }
+    .btn--solid { background: var(--sv-surface-inverse); border-color: var(--sv-surface-inverse); color: var(--sv-text-inverse-primary); }
+    .btn--solid:hover { background: var(--sv-surface-inverse); border-color: var(--sv-surface-inverse); color: var(--sv-text-inverse-primary); opacity: var(--sv-opacity-secondary); }
+
+    input[type="text"], input[type="search"], select {
+      width: 100%;
+      min-width: 0;
+      padding: 0 var(--sv-space-8);
+      height: var(--sv-space-32);
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-surface-canvas);
+      color: var(--sv-text-primary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-caption);
+    }
+    select { cursor: pointer; }
+    input:hover, select:hover { border-color: var(--sv-border-strong); }
+    input::placeholder { color: var(--sv-text-secondary); }
+    .field { display: flex; flex-direction: column; gap: var(--sv-space-4); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .field input, .field select { min-width: 0; }
+
+    .search-form { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sv-space-8); }
+    .search-form .search-input { flex: 1 1 320px; min-width: 0; }
+    .search-form .search-target { flex: 0 1 200px; min-width: 0; }
+
+    .status { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .status.err {
+      padding-left: var(--sv-space-8);
+      border-left: var(--sv-border-width-strong) solid var(--sv-border-strong);
+      color: var(--sv-text-primary);
+    }
+    .status-line { margin-top: var(--sv-space-8); }
+    .blank { padding: var(--sv-space-16) 0; font-size: var(--sv-text-caption); color: var(--sv-text-secondary); }
+    /* 空态占位：撑住搜索区高度，又不在空着时留一大片空白 */
+    .video-slot { min-height: 0; }
+    .video-slot[data-empty="true"] { padding: var(--sv-space-32) 0; }
+    .video-empty {
+      display: flex;
+      align-items: center;
+      gap: var(--sv-space-12);
+      justify-content: center;
+      font-size: var(--sv-text-caption);
+      color: var(--sv-text-secondary);
+    }
+    .video-empty img {
+      display: block;
+      width: var(--sv-space-32);
+      height: var(--sv-space-32);
+      flex: none;
+      border-radius: var(--sv-radius-full);
+      border: var(--sv-border-width-thin) solid var(--sv-border-divider);
+      object-fit: cover;
+    }
+
+    /* ---------- 区域 A：搜视频 ---------- */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: var(--sv-space-16);
+      margin-top: var(--sv-space-16);
+    }
+    .video-card {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-surface-raised);
+      overflow: hidden;
+    }
+    .video-card:hover { border-color: var(--sv-border-control); }
+    .video-figure {
+      position: relative;
+      display: block;
+      margin: 0;
+      aspect-ratio: 16 / 10;
+      background: var(--sv-surface-sunken);
+      overflow: hidden;
+    }
+    .video-figure img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--sv-radius-sm);
+    }
+    .video-figure img[data-broken="true"] { visibility: hidden; }
+    .video-length {
+      position: absolute;
+      right: var(--sv-space-4);
+      bottom: var(--sv-space-4);
+      padding: 0 var(--sv-space-4);
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-surface-inverse);
+      color: var(--sv-text-inverse-primary);
+      font-size: var(--sv-text-micro);
+      line-height: var(--sv-leading-caption);
+    }
+    .video-body { flex: 1; display: flex; flex-direction: column; gap: var(--sv-space-8); padding: var(--sv-space-12); min-width: 0; }
+    .video-title {
+      display: block;
+      font-size: var(--sv-text-caption);
+      font-weight: var(--sv-weight-medium);
+      line-height: var(--sv-leading-caption);
+      color: var(--sv-text-primary);
+      text-decoration: none;
+      overflow-wrap: anywhere;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .video-title:hover { text-decoration: underline; }
+    .video-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .video-meta .video-author { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+    .video-foot { display: flex; align-items: center; gap: var(--sv-space-8); margin-top: auto; padding-top: var(--sv-space-4); }
+    .video-foot .meta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ---------- 区域 B：热梗库 ---------- */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--sv-space-12);
+      margin-bottom: var(--sv-space-16);
+    }
+    .stat {
+      padding: var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-sm);
+      display: grid;
+      gap: var(--sv-space-4);
+    }
+    .stat-label { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .stat-value { font-size: var(--sv-text-heading-m); font-weight: var(--sv-weight-medium); line-height: var(--sv-leading-heading); letter-spacing: var(--sv-tracking-wordmark); }
+    .stat-note { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    .gag-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: var(--sv-space-8);
+      padding: var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-sm);
+    }
+    .gag-toolbar .field { flex: 0 1 220px; min-width: 0; }
+    .gag-toolbar .gag-search { flex: 1 1 240px; }
+
+    .gag-list { display: grid; gap: var(--sv-space-8); margin-top: var(--sv-space-16); }
+    .gag {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sv-space-12);
+      padding: var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-left: var(--sv-border-width-strong) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-sm);
+    }
+    .gag:hover { border-color: var(--sv-border-control); border-left-color: var(--sv-border-strong); }
+    .gag-main { flex: 1; min-width: 0; display: grid; gap: var(--sv-space-4); }
+    .gag-text { font-size: var(--sv-text-body-m); line-height: var(--sv-leading-body); overflow-wrap: anywhere; }
+    .gag-src { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .gag-src .gag-source { min-width: 0; overflow-wrap: anywhere; }
+    .gag-tag {
+      flex: none;
+      padding: 0 var(--sv-space-4);
+      border: var(--sv-border-width-thin) solid var(--sv-border-divider);
+      border-radius: var(--sv-radius-sm);
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+    }
+    .gag-tag--signal { border-color: var(--sv-accent-signal); }
+    .gag-actions { flex: none; display: flex; align-items: center; gap: var(--sv-space-8); }
+    .gag-count { display: flex; align-items: baseline; gap: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    /* ---------- 窄屏 ---------- */
+    @media (max-width: 760px) {
+      .topbar { padding: 0 var(--sv-space-12); gap: var(--sv-space-8); }
+      .brand-rule, .brand-en, .page-name { display: none; }
+      .main { padding: 0 var(--sv-space-12) var(--sv-space-32); }
+      .topbar-right { gap: var(--sv-space-8); }
+      .gag-toolbar .field { flex: 1 1 100%; }
+      .gag { flex-wrap: wrap; }
+      .gag-actions { margin-left: auto; }
+      .video-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <img class="mark-img" src="./assets/whale-logo-64.png" alt="小鲸" width="22" height="22">
+        <span class="brand-zh">小鲸</span>
+        <span class="brand-rule" aria-hidden="true"></span>
+        <a class="mono brand-en" href="./settings.html">symvolve</a>
+      </div>
+      <span class="page-name">热梗库</span>
+      <div class="topbar-right">
+        <a class="btn btn--sm btn--quiet" href="/">返回对话</a>
+        <a class="btn btn--sm" href="/console.html">控制台</a>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- ================= 区域 A：搜视频 ================= -->
+      <section class="section" aria-labelledby="searchTitle">
+        <div class="section-head">
+          <h1 class="section-title" id="searchTitle">搜视频</h1>
+          <span class="section-sub">搜 B 站视频，挑一条发给她</span>
+          <span class="section-head-right">
+            <span class="meta mono" id="keywordNote" hidden></span>
+          </span>
+        </div>
+
+        <form class="search-form" id="searchForm">
+          <input class="search-input" type="search" id="searchInput" placeholder="输入关键词，例如：抽象名场面" autocomplete="off" aria-label="视频关键词">
+          <button class="btn btn--solid" type="submit" id="searchBtn">搜视频</button>
+          <select class="search-target" id="searchTarget" aria-label="发送对象"></select>
+        </form>
+        <p class="status status-line" id="searchStatus" role="status" hidden></p>
+
+        <div class="video-slot" id="videoSlot" data-empty="true">
+          <div class="video-grid" id="videoGrid" hidden></div>
+          <p class="video-empty" id="searchBlank">
+            <img src="./assets/whale-logo-64.png" alt="" width="32" height="32">
+            <span id="searchBlankText">输入关键词，搜一搜最近的视频。</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= 区域 B：热梗库 ================= -->
+      <section class="section" aria-labelledby="gagTitle">
+        <div class="section-head">
+          <h2 class="section-title" id="gagTitle">热梗库</h2>
+          <span class="section-sub">从热门视频里抓来的梗，她聊天时会用</span>
+          <span class="section-head-right">
+            <span class="meta mono" id="gagRange" hidden></span>
+          </span>
+        </div>
+
+        <div class="stats" id="stats">
+          <div class="stat">
+            <span class="stat-label">热梗总数</span>
+            <span class="stat-value mono" id="statGags">—</span>
+            <span class="stat-note" id="statGagsNote">按来源分类</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">抓取视频</span>
+            <span class="stat-value mono" id="statVideos">—</span>
+            <span class="stat-note">来源视频条数</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">上次抓取</span>
+            <span class="stat-value mono" id="statLast">—</span>
+            <span class="stat-note" id="statLastNote">自动抓取时间</span>
+          </div>
+        </div>
+
+        <div class="gag-toolbar">
+          <label class="field">发送对象
+            <select id="gagTarget" aria-label="发送对象"></select>
+          </label>
+          <button type="button" class="btn" id="harvestBtn">抓取热梗</button>
+          <label class="field gag-search">过滤热梗
+            <input type="search" id="gagSearch" placeholder="按梗文本或来源过滤" autocomplete="off" aria-label="过滤热梗">
+          </label>
+          <button type="button" class="btn btn--sm btn--quiet" id="gagReload">刷新</button>
+        </div>
+        <p class="status status-line" id="gagStatus" role="status" hidden></p>
+
+        <div class="gag-count">
+          <span class="meta" id="gagSummary">—</span>
+        </div>
+        <ul class="gag-list" id="gagList"></ul>
+        <p class="blank" id="gagBlank" hidden>热梗库还是空的，先点一次「抓取热梗」。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------------- 基础工具 ---------------- */
+
+      function $(id) { return document.getElementById(id); }
+      function el(tag, cls, text) {
+        var node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text !== undefined && text !== null) node.textContent = String(text);
+        return node;
+      }
+      function clearNode(node) {
+        while (node && node.firstChild) node.removeChild(node.firstChild);
+        return node;
+      }
+      function txt(value) {
+        if (value === null || value === undefined || value === '') return '—';
+        return String(value);
+      }
+      function isNum(value) {
+        if (value === null || value === undefined || value === '') return false;
+        return isFinite(Number(value));
+      }
+      function fmtInt(value) {
+        if (!isNum(value)) return '—';
+        return String(Math.round(Number(value)));
+      }
+      function fmtCount(value) {
+        if (!isNum(value)) return '—';
+        var n = Number(value);
+        if (n >= 100000000) return (n / 100000000).toFixed(1) + ' 亿';
+        if (n >= 10000) return (n / 10000).toFixed(1) + ' 万';
+        return String(Math.round(n));
+      }
+      function pad2(n) { return n < 10 ? '0' + n : String(n); }
+
+      function parseDate(raw) {
+        if (!raw && raw !== 0) return null;
+        if (typeof raw === 'number') {
+          var byNum = new Date(raw > 1e12 ? raw : raw * 1000);
+          return isNaN(byNum.getTime()) ? null : byNum;
+        }
+        var text = String(raw).trim();
+        if (!text) return null;
+        var d = new Date(text);
+        if (!isNaN(d.getTime())) return d;
+        var alt = new Date(text.replace(' ', 'T'));
+        if (!isNaN(alt.getTime())) return alt;
+        return null;
+      }
+      function fmtClock(raw) {
+        var d = parseDate(raw);
+        if (!d) return typeof raw === 'string' && raw ? raw : '—';
+        return pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+      }
+      function fmtDay(raw) {
+        var d = parseDate(raw);
+        if (!d) return txt(raw);
+        return String(d.getFullYear()) + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+      }
+
+      /* ---------------- 状态与提示 ---------------- */
+
+      var state = {
+        friends: [],
+        target: '',
+        videos: [],
+        gags: [],
+        keyword: '',
+        harvesting: false,
+        searching: false,
+        sending: {}
+      };
+
+      function errorMessage(err) {
+        if (err && typeof err.message === 'string' && err.message) return err.message;
+        return '请求未完成，稍后再试。';
+      }
+      function setStatus(id, text, isError) {
+        var node = $(id);
+        if (!node) return;
+        node.textContent = text || '';
+        node.classList.toggle('err', !!isError);
+        node.hidden = !text;
+      }
+      function showError(id, prefix, err) {
+        setStatus(id, prefix + errorMessage(err), true);
+      }
+
+      /* ---------------- 请求：全部容错，不抛异常 ---------------- */
+
+      async function api(path, options) {
+        var opts = options || {};
+        var init = { method: opts.method || 'GET' };
+        init.headers = {};
+        if (opts.body !== undefined) {
+          init.headers['Content-Type'] = 'application/json; charset=utf-8';
+          init.body = JSON.stringify(opts.body);
+        }
+        var token = '';
+        try { token = window.localStorage.getItem('ai-life-console-token') || ''; } catch (err) { token = ''; }
+        if (token) init.headers['X-Console-Token'] = token;
+        var res;
+        try {
+          res = await fetch(path, init);
+        } catch (err) {
+          throw new Error('无法连接本地服务，请确认后端正在运行。');
+        }
+        var raw = '';
+        try { raw = await res.text(); } catch (err) { raw = ''; }
+        var data = null;
+        if (raw) {
+          try { data = JSON.parse(raw); } catch (err) { data = null; }
+        }
+        if (!res.ok) {
+          var detail = '';
+          if (data && typeof data === 'object') {
+            if (typeof data.detail === 'string') detail = data.detail;
+            else if (Array.isArray(data.detail) && data.detail.length && data.detail[0] && typeof data.detail[0].msg === 'string') detail = data.detail[0].msg;
+            else if (typeof data.error === 'string') detail = data.error;
+            else if (typeof data.message === 'string') detail = data.message;
+          }
+          var failure = new Error(detail || ('服务返回错误 ' + res.status));
+          failure.status = res.status;
+          throw failure;
+        }
+        if (data === null) {
+          if (raw) throw new Error('返回内容不是有效 JSON。');
+          return {};
+        }
+        return data;
+      }
+
+      /* ---------------- 好友（发送对象） ---------------- */
+
+      function friendLabel(item) {
+        var name = txt(item.nickname);
+        var openid = item.openid === undefined || item.openid === null || item.openid === '' ? '' : String(item.openid);
+        return openid ? name + ' / ' + openid : name;
+      }
+
+      function fillTargets() {
+        var selects = [$('searchTarget'), $('gagTarget')];
+        selects.forEach(function (sel) {
+          if (!sel) return;
+          var current = sel.value || state.target;
+          clearNode(sel);
+          if (!state.friends.length) {
+            var none = el('option', null, '暂无好友');
+            none.value = '';
+            sel.appendChild(none);
+            sel.disabled = true;
+            return;
+          }
+          sel.disabled = false;
+          state.friends.forEach(function (item) {
+            var opt = el('option', null, friendLabel(item));
+            opt.value = String(item.user_id);
+            sel.appendChild(opt);
+          });
+          var still = current && state.friends.some(function (f) { return String(f.user_id) === String(current); });
+          if (still) {
+            sel.value = String(current);
+          } else {
+            sel.value = String(state.friends[0].user_id);
+          }
+          state.target = sel.value;
+        });
+      }
+
+      function syncTargets(source) {
+        state.target = source && source.value ? String(source.value) : '';
+        [$('searchTarget'), $('gagTarget')].forEach(function (sel) {
+          if (sel && sel !== source && sel.value !== state.target) sel.value = state.target;
+        });
+      }
+
+      async function loadFriends() {
+        try {
+          var data = await api('/v1/console/friends');
+          var list = data && Array.isArray(data.friends) ? data.friends : [];
+          state.friends = list.map(function (raw) {
+            var item = raw || {};
+            return {
+              user_id: item.user_id,
+              openid: item.openid,
+              nickname: item.nickname === undefined || item.nickname === null || item.nickname === '' ? item.openid : item.nickname
+            };
+          });
+          fillTargets();
+        } catch (err) {
+          state.friends = [];
+          fillTargets();
+          showError('searchStatus', '好友加载失败：', err);
+        }
+      }
+
+      /* ---------------- 区域 A：搜视频 ---------------- */
+
+      function renderVideos() {
+        var grid = clearNode($('videoGrid'));
+        var blank = $('searchBlank');
+        var hasItems = state.videos.length > 0;
+        grid.hidden = !hasItems;
+        blank.hidden = hasItems;
+        $('videoSlot').setAttribute('data-empty', hasItems ? 'false' : 'true');
+        if (!hasItems) {
+          $('searchBlankText').textContent = state.keyword ? '没有搜到视频，换个关键词试试。' : '输入关键词，搜一搜最近的视频。';
+          return;
+        }
+        state.videos.forEach(function (item) {
+          grid.appendChild(videoCard(item));
+        });
+      }
+
+      function videoCard(item) {
+        var card = el('article', 'video-card');
+
+        var figure = el('figure', 'video-figure');
+        var link = el('a');
+        link.href = item.url || (item.bvid ? 'https://www.bilibili.com/video/' + encodeURIComponent(item.bvid) : '#');
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.setAttribute('aria-label', '在 B 站打开 ' + txt(item.title));
+        var img = el('img');
+        img.alt = '';
+        img.loading = 'lazy';
+        img.src = item.pic || './assets/whale-logo-64.png';
+        img.addEventListener('error', function () {
+          img.setAttribute('data-broken', 'true');
+        });
+        link.appendChild(img);
+        if (item.duration) link.appendChild(el('span', 'video-length mono', fmtDuration(item.duration)));
+        figure.appendChild(link);
+
+        var body = el('div', 'video-body');
+        var titleLink = el('a', 'video-title', txt(item.title));
+        titleLink.href = link.href;
+        titleLink.target = '_blank';
+        titleLink.rel = 'noopener noreferrer';
+        body.appendChild(titleLink);
+
+        var metaRow = el('div', 'video-meta');
+        metaRow.appendChild(el('span', 'video-author', 'UP主 ' + txt(item.author)));
+        metaRow.appendChild(el('span', 'mono', '播放 ' + fmtCount(item.play)));
+        metaRow.appendChild(el('span', 'mono', fmtClock(item.pubdate)));
+        body.appendChild(metaRow);
+
+        var foot = el('div', 'video-foot');
+        foot.appendChild(el('span', 'meta mono', txt(item.bvid)));
+        var send = el('button', 'btn btn--sm', '发送到 QQ');
+        send.type = 'button';
+        send.disabled = !state.friends.length || !!state.sending[item.bvid];
+        if (!state.friends.length) send.title = '先在顶栏添加好友，再来发送';
+        send.addEventListener('click', function () { sendVideo(item, send); });
+        foot.appendChild(send);
+        body.appendChild(foot);
+
+        card.appendChild(figure);
+        card.appendChild(body);
+        return card;
+      }
+
+      function fmtDuration(raw) {
+        if (raw === null || raw === undefined || raw === '') return '—';
+        var text = String(raw).trim();
+        if (text.indexOf(':') >= 0) return text;
+        var sec = Number(text);
+        if (!isFinite(sec) || sec < 0) return text;
+        var m = Math.floor(sec / 60);
+        var s = Math.floor(sec % 60);
+        if (m >= 60) {
+          var h = Math.floor(m / 60);
+          return h + ':' + pad2(m % 60) + ':' + pad2(s);
+        }
+        return pad2(m) + ':' + pad2(s);
+      }
+
+      async function searchVideos() {
+        if (state.searching) return;
+        var q = $('searchInput').value.trim();
+        if (!q) {
+          setStatus('searchStatus', '先输入关键词。', true);
+          return;
+        }
+        var btn = $('searchBtn');
+        state.searching = true;
+        btn.disabled = true;
+        setStatus('searchStatus', '搜索中…', false);
+        try {
+          var data = await api('/v1/trend/search?q=' + encodeURIComponent(q) + '&limit=12');
+          var list = data && Array.isArray(data.items) ? data.items : [];
+          state.videos = list.map(function (raw) {
+            var item = raw || {};
+            return {
+              bvid: item.bvid,
+              title: item.title,
+              author: item.author,
+              play: item.play,
+              duration: item.duration,
+              pubdate: item.pubdate,
+              pic: item.pic,
+              url: item.url
+            };
+          });
+          state.keyword = data && data.keyword ? String(data.keyword) : q;
+          renderVideos();
+          var kw = $('keywordNote');
+          kw.textContent = state.keyword ? '「' + state.keyword + '」· ' + state.videos.length + ' 条' : '';
+          kw.hidden = !state.keyword;
+          setStatus('searchStatus', '', false);
+        } catch (err) {
+          state.videos = [];
+          renderVideos();
+          showError('searchStatus', '搜索失败：', err);
+        } finally {
+          state.searching = false;
+          btn.disabled = false;
+        }
+      }
+
+      async function sendVideo(item, btn) {
+        if (!state.target) {
+          setStatus('searchStatus', '先选一个发送对象。', true);
+          return;
+        }
+        var prev = btn.textContent;
+        state.sending[item.bvid] = true;
+        btn.disabled = true;
+        btn.textContent = '发送中';
+        setStatus('searchStatus', '正在发送视频…', false);
+        try {
+          var data = await api('/v1/trend/send_video', {
+            method: 'POST',
+            body: { user_id: Number(state.target), bvid: item.bvid }
+          });
+          var sent = data && data.sent !== undefined ? data.sent : null;
+          var ok = data && data.ok !== false;
+          if (!ok) {
+            setStatus('searchStatus', '发送未完成：' + (sent === false ? '对方没有收到消息，检查 QQ 连接。' : '服务没有确认发送。'), true);
+          } else if (sent === false) {
+            setStatus('searchStatus', '未送达：已记下这条视频，但 QQ 消息没有发出去，检查 QQ 连接。', true);
+          } else {
+            setStatus('searchStatus', '已发送：' + txt(item.title), false);
+          }
+        } catch (err) {
+          showError('searchStatus', '发送失败：', err);
+        } finally {
+          delete state.sending[item.bvid];
+          btn.textContent = prev;
+          btn.disabled = !state.target;
+        }
+      }
+
+      /* ---------------- 区域 B：热梗库 ---------------- */
+
+      function renderStats(stats) {
+        var gags = stats && stats.gags && typeof stats.gags === 'object' ? stats.gags : {};
+        var videos = stats && stats.videos;
+        var videoTotal = videos && typeof videos === 'object' ? videos.total : videos;
+        $('statGags').textContent = fmtInt(gags.total);
+        var kinds = gags.by_kind && typeof gags.by_kind === 'object' ? gags.by_kind : {};
+        var kindNames = Object.keys(kinds).map(function (key) {
+          return kindLabel(key) + ' ' + fmtInt(kinds[key]);
+        });
+        $('statGagsNote').textContent = kindNames.length ? kindNames.join(' / ') : '暂无分类';
+        $('statVideos').textContent = fmtInt(videoTotal);
+        $('statLast').textContent = stats && stats.last_harvest ? fmtDay(stats.last_harvest) : '—';
+      }
+
+      function kindLabel(kind) {
+        var map = { comment: '评论', danmaku: '弹幕', title: '标题', tag: '标签' };
+        var key = String(kind || '');
+        return map[key] || (key || '其他');
+      }
+
+      function applyGagFilter() {
+        var q = $('gagSearch').value.trim().toLowerCase();
+        var list = state.gags.filter(function (item) {
+          if (!q) return true;
+          var text = String(item.text || '').toLowerCase();
+          var src = String(item.source || '').toLowerCase();
+          return text.indexOf(q) >= 0 || src.indexOf(q) >= 0;
+        });
+        renderGags(list);
+      }
+
+      function renderGags(list) {
+        var box = clearNode($('gagList'));
+        var blank = $('gagBlank');
+        $('gagSummary').textContent = state.gags.length ? '显示 ' + list.length + ' / 共 ' + state.gags.length + ' 条' : '—';
+        if (!state.gags.length) {
+          blank.textContent = '热梗库还是空的，先点一次「抓取热梗」。';
+          blank.hidden = false;
+          return;
+        }
+        if (!list.length) {
+          blank.textContent = '没有匹配的热梗。';
+          blank.hidden = false;
+          return;
+        }
+        blank.hidden = true;
+        list.forEach(function (item) {
+          box.appendChild(gagRow(item));
+        });
+      }
+
+      function gagRow(item) {
+        var li = el('li', 'gag');
+
+        var main = el('div', 'gag-main');
+        main.appendChild(el('p', 'gag-text', txt(item.text)));
+
+        var src = el('div', 'gag-src');
+        src.appendChild(el('span', 'gag-source', '来源 ' + txt(item.source)));
+        if (item.bvid) {
+          var link = el('a', 'mono', String(item.bvid));
+          link.href = 'https://www.bilibili.com/video/' + encodeURIComponent(item.bvid);
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          src.appendChild(link);
+        }
+        src.appendChild(el('span', 'mono', '赞 ' + fmtCount(item.likes)));
+        src.appendChild(el('span', 'mono', fmtClock(item.harvested_at)));
+        main.appendChild(src);
+
+        var actions = el('div', 'gag-actions');
+        if (item.kind) actions.appendChild(el('span', 'gag-tag' + (item.kind === 'comment' ? ' gag-tag--signal' : ''), kindLabel(item.kind)));
+        var del = el('button', 'btn btn--sm btn--quiet', '删除');
+        del.type = 'button';
+        del.addEventListener('click', function () { deleteGag(item, del); });
+        actions.appendChild(del);
+
+        li.appendChild(main);
+        li.appendChild(actions);
+        return li;
+      }
+
+      async function loadStats() {
+        try {
+          var data = await api('/v1/trend/stats');
+          renderStats(data);
+        } catch (err) {
+          renderStats(null);
+          showError('gagStatus', '统计加载失败：', err);
+        }
+      }
+
+      async function loadGags() {
+        try {
+          var data = await api('/v1/trend/gags');
+          var list = data && Array.isArray(data.items) ? data.items : (Array.isArray(data) ? data : []);
+          state.gags = list.map(function (raw) {
+            var item = raw || {};
+            return {
+              id: item.id,
+              text: item.text,
+              source: item.source_title !== undefined ? item.source_title : item.source,
+              likes: item.likes,
+              bvid: item.bvid,
+              harvested_at: item.harvested_at,
+              kind: item.kind
+            };
+          });
+          applyGagFilter();
+        } catch (err) {
+          state.gags = [];
+          applyGagFilter();
+          showError('gagStatus', '热梗加载失败：', err);
+        }
+      }
+
+      async function harvest() {
+        if (state.harvesting) return;
+        var btn = $('harvestBtn');
+        state.harvesting = true;
+        btn.disabled = true;
+        setStatus('gagStatus', '抓取中，需要一点时间…', false);
+        try {
+          var data = await api('/v1/trend/harvest', { method: 'POST', body: { limit: 20 } });
+          var added = data && data.added !== undefined ? fmtInt(data.added) : '—';
+          var videos = data && data.videos !== undefined ? fmtInt(data.videos) : '—';
+          if (data && data.ok === false) {
+            setStatus('gagStatus', '抓取未完成：服务没有返回成功。', true);
+          } else {
+            setStatus('gagStatus', '抓取完成：新增 ' + added + ' 条，扫过 ' + videos + ' 个视频。', false);
+          }
+          await loadStats();
+          await loadGags();
+        } catch (err) {
+          showError('gagStatus', '抓取失败：', err);
+        } finally {
+          state.harvesting = false;
+          btn.disabled = false;
+        }
+      }
+
+      async function deleteGag(item, btn) {
+        if (item.id === undefined || item.id === null) {
+          setStatus('gagStatus', '这条热梗缺少编号，无法删除。', true);
+          return;
+        }
+        if (!window.confirm('删除这条热梗？\n「' + txt(item.text) + '」')) return;
+        btn.disabled = true;
+        setStatus('gagStatus', '删除中…', false);
+        try {
+          await api('/v1/trend/gags/' + encodeURIComponent(item.id), { method: 'DELETE' });
+          setStatus('gagStatus', '已删除。', false);
+          await loadStats();
+          await loadGags();
+        } catch (err) {
+          btn.disabled = false;
+          showError('gagStatus', '删除未完成：', err);
+        }
+      }
+
+      /* ---------------- 绑定 ---------------- */
+
+      function bind() {
+        $('searchForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          searchVideos();
+        });
+        $('searchTarget').addEventListener('change', function () { syncTargets(this); renderVideos(); });
+        $('gagTarget').addEventListener('change', function () { syncTargets(this); renderVideos(); });
+        $('harvestBtn').addEventListener('click', harvest);
+        $('gagReload').addEventListener('click', function () { loadStats(); loadGags(); });
+        $('gagSearch').addEventListener('input', applyGagFilter);
+      }
+
+      function init() {
+        bind();
+        fillTargets();
+        renderVideos();
+        applyGagFilter();
+        loadFriends();
+        loadStats();
+        loadGags();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

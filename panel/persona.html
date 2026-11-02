@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="zh-CN" data-symvolve-scaffold="persona">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>人设卡 · 小鲸 · 衡忆</title>
+  <link rel="stylesheet" href="./symvolve-tokens.css">
+<link rel="stylesheet" href="./symvolve.css">
+  <script src="./symvolve-components.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      background: var(--sv-surface-canvas);
+      color: var(--sv-text-primary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-body-m);
+      line-height: var(--sv-leading-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    [hidden] { display: none !important; }
+    h1, h2, h3, p, blockquote, figure { margin: 0; }
+    button, input, select, textarea { font: inherit; }
+    a { color: var(--sv-text-primary); text-decoration: underline; text-underline-offset: var(--sv-border-width-strong); }
+    a:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+    ::selection { background: var(--sv-selection-background); color: var(--sv-selection-text); }
+    .mono { font-family: var(--sv-font-mono); font-variant-numeric: tabular-nums; letter-spacing: var(--sv-tracking-codename); }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: var(--sv-space-32) var(--sv-space-32) var(--sv-space-64);
+    }
+
+    /* ---------- 顶栏 ---------- */
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sv-space-16);
+      padding-bottom: var(--sv-space-16);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+    }
+    .brand { display: flex; align-items: center; gap: var(--sv-space-8); }
+    .whale-mark {
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: var(--sv-radius-full);
+      object-fit: cover;
+      border: 1px solid var(--sv-border-divider);
+    }
+    .brand-zh { font-size: var(--sv-text-body-m); font-weight: var(--sv-weight-medium); }
+    .brand-en { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); letter-spacing: var(--sv-tracking-codename); }
+    .top-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sv-space-8); }
+
+    /* ---------- 页头 ---------- */
+    .page-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--sv-space-16);
+      margin: var(--sv-space-32) 0 var(--sv-space-16);
+    }
+    .page-title {
+      font-size: var(--sv-text-heading-l);
+      font-weight: var(--sv-weight-medium);
+      line-height: var(--sv-leading-heading);
+      letter-spacing: var(--sv-tracking-display);
+    }
+    .page-sub { margin-top: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .badge {
+      padding: 0 var(--sv-space-8);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-full);
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+      white-space: nowrap;
+    }
+    .status {
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+    }
+    .status.err {
+      padding-left: var(--sv-space-8);
+      border-left: var(--sv-border-width-strong) solid var(--sv-border-strong);
+      color: var(--sv-text-primary);
+    }
+
+    /* ---------- 两栏 ---------- */
+    .layout { display: grid; gap: var(--sv-space-24); margin-top: var(--sv-space-24); }
+    @media (min-width: 1000px) {
+      .layout { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; }
+      .preview { position: sticky; top: var(--sv-space-24); }
+    }
+    .editor { display: grid; gap: var(--sv-space-16); }
+
+    /* ---------- 分组卡片 ---------- */
+    .card {
+      padding: var(--sv-space-16) var(--sv-space-24);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-lg);
+      background: var(--sv-surface-raised);
+    }
+    .card-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--sv-space-12);
+      margin-bottom: var(--sv-space-12);
+    }
+    .card-head h2 {
+      font-size: var(--sv-text-caption);
+      font-weight: var(--sv-weight-medium);
+    }
+    .meta { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    .hint { margin-top: var(--sv-space-8); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    .grid-2 {
+      display: grid;
+      gap: var(--sv-space-12);
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sv-space-4);
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+    }
+    .field.wide { grid-column: 1 / -1; }
+
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 0 var(--sv-space-8);
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-surface-canvas);
+      color: var(--sv-text-primary);
+      font-family: var(--sv-font-zh);
+      font-size: var(--sv-text-caption);
+    }
+    input[type="text"], input[type="number"], select { height: var(--sv-space-32); }
+    textarea {
+      padding: var(--sv-space-8);
+      min-height: var(--sv-space-96);
+      line-height: var(--sv-leading-body);
+      resize: vertical;
+    }
+    textarea.short { min-height: var(--sv-space-48); }
+    input:hover, select:hover, textarea:hover { border-color: var(--sv-border-strong); }
+    input:focus-visible, select:focus-visible, textarea:focus-visible {
+      border-color: var(--sv-border-strong);
+      outline: var(--sv-border-width-strong) solid var(--sv-focus-ring);
+      outline-offset: calc(var(--sv-border-width-thin) * -1);
+    }
+    input::placeholder, textarea::placeholder { color: var(--sv-text-muted); }
+
+    /* ---------- 按钮 ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--sv-space-32);
+      padding: 0 var(--sv-space-12);
+      border: var(--sv-border-width-thin) solid var(--sv-border-control);
+      border-radius: var(--sv-radius-sm);
+      background: transparent;
+      color: var(--sv-text-primary);
+      font-size: var(--sv-text-caption);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--sv-surface-sunken); border-color: var(--sv-border-strong); }
+    .btn:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+    .btn:disabled { background: var(--sv-disabled-surface); border-color: var(--sv-disabled-border); color: var(--sv-disabled-text); cursor: not-allowed; }
+    .btn--sm { height: var(--sv-space-24); padding: 0 var(--sv-space-8); font-size: var(--sv-text-micro); }
+    .btn--primary { background: var(--sv-surface-inverse); color: var(--sv-text-inverse-primary); border-color: var(--sv-border-strong); }
+    .btn--primary:hover { background: var(--sv-surface-inverse); color: var(--sv-text-inverse-primary); opacity: 0.88; }
+
+    /* ---------- 性格特质 ---------- */
+    .traits { display: grid; gap: var(--sv-space-12); }
+    .trait-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sv-space-12); }
+    .trait-name { font-size: var(--sv-text-caption); }
+    .trait-num { display: flex; align-items: center; gap: var(--sv-space-8); }
+    .trait-input { width: var(--sv-space-64); height: var(--sv-space-24); text-align: right; }
+    .trait-bounds { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+    input[type="range"] {
+      width: 100%;
+      height: var(--sv-space-16);
+      margin: var(--sv-space-4) 0 0;
+      padding: 0;
+      background: transparent;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="range"]::-webkit-slider-runnable-track { height: var(--sv-border-width-strong); background: var(--sv-border-control); }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: var(--sv-space-12);
+      height: var(--sv-space-12);
+      margin-top: calc((var(--sv-space-12) - var(--sv-border-width-strong)) * -0.5);
+      border: 0;
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-text-primary);
+    }
+    input[type="range"]::-moz-range-track { height: var(--sv-border-width-strong); background: var(--sv-border-control); }
+    input[type="range"]::-moz-range-thumb {
+      width: var(--sv-space-12);
+      height: var(--sv-space-12);
+      border: 0;
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-text-primary);
+    }
+    input[type="range"]:focus-visible { outline: var(--sv-border-width-strong) solid var(--sv-focus-ring); outline-offset: var(--sv-border-width-strong); }
+
+    /* ---------- 阶段表 ---------- */
+    .table-wrap { overflow-x: auto; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: var(--sv-text-caption); }
+    .tbl th {
+      padding: var(--sv-space-8) var(--sv-space-8);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      background: var(--sv-surface-sunken);
+      color: var(--sv-text-secondary);
+      font-weight: var(--sv-weight-regular);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .tbl td {
+      padding: var(--sv-space-4) var(--sv-space-4);
+      border-bottom: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      vertical-align: middle;
+    }
+    .tbl tr:last-child td { border-bottom: 0; }
+    .tbl input[type="text"], .tbl input[type="number"] {
+      height: var(--sv-space-24);
+      padding: 0 var(--sv-space-4);
+      border-color: transparent;
+      background: transparent;
+    }
+    .tbl input:focus-visible { background: var(--sv-surface-canvas); border-color: var(--sv-border-strong); }
+    .tbl .col-key { width: 20%; }
+    .tbl .col-label { width: 24%; }
+    .tbl .col-at { width: 14%; }
+    .tbl .col-call { width: 30%; }
+    .tbl .col-act { width: 12%; }
+
+    /* ---------- 右侧预览 ---------- */
+    .preview-card {
+      display: grid;
+      gap: var(--sv-space-12);
+      padding: var(--sv-space-24);
+      border: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+      border-radius: var(--sv-radius-lg);
+      background: var(--sv-surface-raised);
+    }
+    .preview-label {
+      font-size: var(--sv-text-micro);
+      color: var(--sv-text-secondary);
+      letter-spacing: var(--sv-tracking-micro-caps);
+    }
+    .preview-call {
+      font-size: var(--sv-text-heading-l);
+      font-weight: var(--sv-weight-medium);
+      line-height: var(--sv-leading-heading);
+      letter-spacing: var(--sv-tracking-display);
+    }
+    .preview-stage { font-size: var(--sv-text-caption); color: var(--sv-text-secondary); }
+    .preview-stage b { color: var(--sv-text-primary); font-family: var(--sv-font-mono); font-weight: var(--sv-weight-regular); }
+    .preview-line {
+      padding-left: var(--sv-space-12);
+      border-left: var(--sv-border-width-strong) solid var(--sv-accent-signal);
+      font-size: var(--sv-text-body-l);
+      line-height: var(--sv-leading-body);
+    }
+    .preview-ctrl {
+      display: grid;
+      gap: var(--sv-space-12);
+      padding-top: var(--sv-space-12);
+      border-top: var(--sv-border-width-thin) solid var(--sv-border-hairline);
+    }
+    .preview-ctrl .field { gap: var(--sv-space-8); }
+    .preview-ctrl .value { font-family: var(--sv-font-mono); color: var(--sv-text-primary); }
+    .preview-meta { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); }
+
+    @media (max-width: 640px) {
+      .shell { padding: var(--sv-space-16) var(--sv-space-16) var(--sv-space-48); }
+      .page-head { align-items: flex-start; flex-direction: column; }
+      .card { padding: var(--sv-space-12) var(--sv-space-16); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <img class="whale-mark" src="./assets/whale-logo-64.png" alt="小鲸" width="22" height="22">
+        <span class="brand-zh">小鲸</span>
+        <span class="mono brand-en">symvolve</span>
+      </div>
+      <div class="top-actions">
+        <span class="badge" id="sourceBadge">来源 · —</span>
+        <a class="btn btn--sm" href="./settings.html">返回设置</a>
+        <button type="button" class="btn btn--sm" id="btnExport">导出 JSON</button>
+        <button type="button" class="btn btn--sm" id="btnImportPick">导入 JSON</button>
+        <button type="button" class="btn btn--sm btn--primary" id="btnSave">保存</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+    </header>
+
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">人设卡</h1>
+        <p class="page-sub" id="pageSub">人物设定 · 改完保存，下一句话就生效</p>
+      </div>
+      <p class="status" id="status" role="status" hidden></p>
+    </div>
+
+    <div class="layout">
+      <form class="editor" id="editForm" autocomplete="off">
+        <section class="card">
+          <div class="card-head">
+            <h2>基本</h2>
+            <span class="meta">名字、称呼与一句话</span>
+          </div>
+          <div class="grid-2">
+            <label class="field">名字
+              <input type="text" id="name" placeholder="她叫什么">
+            </label>
+            <label class="field">物种
+              <input type="text" id="species" placeholder="人类 / 鲸 / …">
+            </label>
+            <label class="field">年龄
+              <input type="text" id="ageLabel" placeholder="26 岁">
+            </label>
+            <label class="field">自称
+              <input type="text" id="selfRef" placeholder="我">
+            </label>
+            <label class="field wide">一句话
+              <input type="text" id="tagline" placeholder="话多，回得快，夜里最清醒">
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>人设正文</h2>
+            <span class="meta">世界观与形貌，写具体的事</span>
+          </div>
+          <div class="grid-2">
+            <label class="field wide">世界 / 经历
+              <textarea id="world" rows="5" placeholder="她住在哪、做什么、每天怎么过"></textarea>
+            </label>
+            <label class="field wide">形貌
+              <textarea id="appearance" rows="4" placeholder="头发、衣着、声音、小动作"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>性格特质</h2>
+            <span class="meta">数值写进 traits 表，上下限只读</span>
+          </div>
+          <div class="traits" id="traits"></div>
+          <p class="hint">拖动或直接输入；保存时会 clamp 到人设给的 min/max，越界自动收回。</p>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>说话风格</h2>
+            <span class="meta">一行一条，空的自动丢掉</span>
+          </div>
+          <div class="grid-2">
+            <label class="field wide">风格
+              <textarea id="speechStyle" rows="5" placeholder="一句话拆成好几条发"></textarea>
+            </label>
+            <label class="field wide">规则
+              <textarea id="speechRules" rows="6" placeholder="一次 1 到 3 条，每条尽量短"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>阶段表</h2>
+            <span class="meta">好感门槛 at：0–100，按 at 自动排序</span>
+          </div>
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th class="col-key">key</th>
+                  <th class="col-label">阶段名</th>
+                  <th class="col-at">at</th>
+                  <th class="col-call">她怎么称呼你</th>
+                  <th class="col-act">操作</th>
+                </tr>
+              </thead>
+              <tbody id="stagesBody"></tbody>
+            </table>
+          </div>
+          <p class="hint">
+            <button type="button" class="btn btn--sm" id="btnAddStage">加一个阶段</button>
+            <span>behavior / unlock 不在这一页编辑，保存时原样保留。</span>
+          </p>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>边界词</h2>
+            <span class="meta">原则、底线、修复与禁止项</span>
+          </div>
+          <div class="grid-2">
+            <label class="field wide">原则 principle
+              <textarea id="blPrinciple" rows="3" placeholder="可以有情绪，但不能惩罚他"></textarea>
+            </label>
+            <label class="field wide">底线 floor
+              <textarea id="blFloor" rows="2" class="short" placeholder="再冷的时候，底线也是关心但克制"></textarea>
+            </label>
+            <label class="field">修复 repair（一行一条）
+              <textarea id="blRepair" rows="4" placeholder="先接住，不判断对错"></textarea>
+            </label>
+            <label class="field">禁止 forbidden（一行一条）
+              <textarea id="blForbidden" rows="4" placeholder="用沉默惩罚对方"></textarea>
+            </label>
+          </div>
+        </section>
+      </form>
+
+      <aside class="preview" aria-label="实时预览">
+        <div class="preview-card">
+          <p class="preview-label">她会怎么称呼你</p>
+          <p class="preview-call" id="pvCall">—</p>
+          <p class="preview-stage">当前阶段 <b id="pvStage">—</b></p>
+          <blockquote class="preview-line" id="pvLine">—</blockquote>
+          <div class="preview-ctrl">
+            <label class="field">好感度 <span class="value mono" id="pvAffinityVal">60</span>
+              <input type="range" id="pvAffinity" min="0" max="100" step="1" value="60">
+            </label>
+            <label class="field">家人角色
+              <select id="pvRole">
+                <option value="">自动</option>
+                <option value="生父">生父（爹）</option>
+                <option value="干爹">干爹</option>
+              </select>
+            </label>
+          </div>
+          <p class="preview-meta" id="pvMeta">—</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var API = '/v1/persona-card';
+      var EXPORT_URL = '/v1/persona-card/export';
+      var IMPORT_URL = '/v1/persona-card/import';
+      var PREVIEW_URL = '/v1/persona-card/preview';
+      // 阶段表里这些只是说明词，不是真称呼
+      var PLACEHOLDERS = ['', '你', '「你」', '他的名字', '小名', '你定的称呼', '只有你们两个人用的称呼'];
+
+      var $ = function (id) { return document.getElementById(id); };
+      var lastSample = '';
+      var previewError = '';
+      var previewTimer = null;
+      var statusTimer = null;
+
+      var TOKEN = '';
+      try {
+        TOKEN = new URLSearchParams(window.location.search).get('token')
+          || window.localStorage.getItem('ai-life-console-token')
+          || '';
+      } catch (e) {
+        TOKEN = '';
+      }
+
+      function withToken(path) {
+        if (!TOKEN) { return path; }
+        return path + (path.indexOf('?') >= 0 ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN);
+      }
+
+      function authHeaders(base) {
+        var headers = base || {};
+        if (TOKEN) { headers['X-Console-Token'] = TOKEN; }
+        return headers;
+      }
+
+      function detailOf(body, fallback) {
+        if (!body) { return fallback; }
+        var d = body.detail;
+        if (typeof d === 'string') { return d; }
+        if (Array.isArray(d)) {
+          return d.map(function (item) {
+            return (item && item.msg) ? item.msg : JSON.stringify(item);
+          }).join('；');
+        }
+        return fallback;
+      }
+
+      function request(path, options) {
+        var opts = options || {};
+        opts.headers = authHeaders(opts.headers);
+        return fetch(withToken(path), opts).then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (body) {
+            if (!res.ok) { throw new Error(detailOf(body, 'HTTP ' + res.status)); }
+            return body;
+          });
+        });
+      }
+
+      function setStatus(text, isErr) {
+        var el = $('status');
+        if (statusTimer) { clearTimeout(statusTimer); statusTimer = null; }
+        if (!text) {
+          el.hidden = true;
+          el.textContent = '';
+          el.classList.remove('err');
+          return;
+        }
+        el.hidden = false;
+        el.textContent = text;
+        el.classList.toggle('err', !!isErr);
+        if (!isErr) {
+          statusTimer = setTimeout(function () { setStatus('', false); }, 5000);
+        }
+      }
+
+      function linesOf(id) {
+        return $(id).value.split(/\r?\n/).map(function (line) {
+          return line.trim();
+        }).filter(function (line) { return !!line; });
+      }
+
+      function setLines(id, items) {
+        $(id).value = (items || []).join('\n');
+      }
+
+      function fmtNum(n) {
+        var v = Number(n);
+        if (!isFinite(v)) { return '0'; }
+        return String(Math.round(v * 10) / 10);
+      }
+
+      function familyCall(role) {
+        if (role === '生父') { return '爹'; }
+        if (role === '干爹') { return '干爹'; }
+        return '';
+      }
+
+      function normalizeCall(raw) {
+        var text = String(raw || '').trim();
+        return PLACEHOLDERS.indexOf(text) >= 0 ? '你' : text;
+      }
+
+      // ---------- 渲染 ----------
+
+      function renderTraits(traits) {
+        var box = $('traits');
+        box.textContent = '';
+        Object.keys(traits || {}).forEach(function (dim) {
+          var spec = traits[dim] || {};
+          var min = Number(spec.min);
+          var max = Number(spec.max);
+          var value = Number(spec.value);
+          if (!isFinite(min)) { min = 0; }
+          if (!isFinite(max)) { max = 100; }
+          if (!isFinite(value)) { value = min; }
+
+          var row = document.createElement('div');
+          row.className = 'trait';
+          row.dataset.dim = dim;
+
+          var head = document.createElement('div');
+          head.className = 'trait-head';
+          var name = document.createElement('span');
+          name.className = 'trait-name';
+          name.textContent = dim;
+
+          var numWrap = document.createElement('span');
+          numWrap.className = 'trait-num';
+          var num = document.createElement('input');
+          num.type = 'number';
+          num.className = 'trait-input mono';
+          num.min = String(min);
+          num.max = String(max);
+          num.step = '1';
+          num.value = String(value);
+          var bounds = document.createElement('span');
+          bounds.className = 'trait-bounds mono';
+          bounds.textContent = fmtNum(min) + '–' + fmtNum(max);
+          numWrap.appendChild(num);
+          numWrap.appendChild(bounds);
+
+          head.appendChild(name);
+          head.appendChild(numWrap);
+
+          var range = document.createElement('input');
+          range.type = 'range';
+          range.className = 'trait-range';
+          range.min = String(min);
+          range.max = String(max);
+          range.step = '1';
+          range.value = String(value);
+
+          range.addEventListener('input', function () {
+            num.value = range.value;
+            localPreview();
+          });
+          num.addEventListener('input', function () {
+            var v = Number(num.value);
+            if (isFinite(v)) { range.value = String(Math.max(min, Math.min(max, v))); }
+            localPreview();
+          });
+          num.addEventListener('change', function () {
+            var v = Number(num.value);
+            if (!isFinite(v)) { v = min; }
+            v = Math.max(min, Math.min(max, v));
+            num.value = String(v);
+            range.value = String(v);
+            localPreview();
+          });
+
+          row.appendChild(head);
+          row.appendChild(range);
+          box.appendChild(row);
+        });
+      }
+
+      function cellInput(className, value, placeholder) {
+        var td = document.createElement('td');
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = className;
+        input.value = value == null ? '' : String(value);
+        if (placeholder) { input.placeholder = placeholder; }
+        td.appendChild(input);
+        return td;
+      }
+
+      function stageRow(stage) {
+        var tr = document.createElement('tr');
+        tr.className = 'stage-row';
+        tr.appendChild(cellInput('st-key mono', stage.key, 'observer'));
+        tr.appendChild(cellInput('st-label', stage.label, '观察者'));
+
+        var atTd = document.createElement('td');
+        var at = document.createElement('input');
+        at.type = 'number';
+        at.className = 'st-at mono';
+        at.min = '0';
+        at.max = '100';
+        at.step = '1';
+        at.value = String(fmtNum(stage.at));
+        atTd.appendChild(at);
+        tr.appendChild(atTd);
+
+        tr.appendChild(cellInput('st-call', stage.call_user, '「你」'));
+
+        var actTd = document.createElement('td');
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'btn btn--sm st-del';
+        del.textContent = '删';
+        del.addEventListener('click', function () {
+          tr.remove();
+          localPreview();
+        });
+        actTd.appendChild(del);
+        tr.appendChild(actTd);
+        return tr;
+      }
+
+      function renderStages(stages) {
+        var body = $('stagesBody');
+        body.textContent = '';
+        (stages || []).forEach(function (stage) {
+          body.appendChild(stageRow(stage || {}));
+        });
+      }
+
+      function collectTraits() {
+        var out = {};
+        document.querySelectorAll('#traits .trait').forEach(function (row) {
+          var input = row.querySelector('.trait-input');
+          if (!input) { return; }
+          var value = Number(input.value);
+          if (isFinite(value)) { out[row.dataset.dim] = value; }
+        });
+        return out;
+      }
+
+      function collectStages() {
+        var out = [];
+        document.querySelectorAll('#stagesBody .stage-row').forEach(function (tr) {
+          var key = tr.querySelector('.st-key').value.trim();
+          var label = tr.querySelector('.st-label').value.trim();
+          var at = Number(tr.querySelector('.st-at').value);
+          var call = tr.querySelector('.st-call').value.trim();
+          if (!key && !label && !call) { return; }
+          out.push({
+            key: key,
+            label: label,
+            at: isFinite(at) ? at : 0,
+            call_user: call
+          });
+        });
+        return out;
+      }
+
+      // ---------- 预览 ----------
+
+      function localPreview() {
+        var affinity = Number($('pvAffinity').value);
+        if (!isFinite(affinity)) { affinity = 60; }
+
+        var stages = collectStages();
+        var best = null;
+        var bestAt = -1;
+        stages.forEach(function (stage) {
+          var at = Number(stage.at);
+          if (!isFinite(at)) { at = 0; }
+          if (affinity >= at && at >= bestAt) {
+            best = stage;
+            bestAt = at;
+          }
+        });
+        if (!best && stages.length) { best = stages[0]; }
+
+        var role = $('pvRole').value;
+        var call = familyCall(role);
+        if (!call) { call = normalizeCall(best ? best.call_user : ''); }
+
+        $('pvCall').textContent = call || '你';
+        $('pvStage').textContent = best
+          ? ((best.label || best.key || '—') + ' · ' + fmtNum(best.at))
+          : '—';
+        $('pvLine').textContent = lastSample || '—';
+
+        var meta = [];
+        if (role) { meta.push('家人：' + role); }
+        meta.push('好感 ' + fmtNum(affinity));
+        if (previewError) { meta.push('预览接口没回应'); }
+        $('pvMeta').textContent = previewError
+          ? ('预览接口没回应：' + previewError)
+          : (meta.join(' · ') || '—');
+
+        $('pageSub').textContent = '人物设定 · ' + ($('name').value.trim() || '她')
+          + ' · 改完保存，下一句话就生效';
+      }
+
+      function fetchPreview() {
+        var affinity = Number($('pvAffinity').value);
+        if (!isFinite(affinity)) { affinity = 60; }
+        var role = $('pvRole').value || '';
+        var path = PREVIEW_URL + '?affinity=' + encodeURIComponent(affinity);
+        if (role) { path += '&role=' + encodeURIComponent(role); }
+        request(path).then(function (data) {
+          previewError = '';
+          lastSample = data.sample_line || '';
+          localPreview();
+        }).catch(function (err) {
+          previewError = err.message;
+          localPreview();
+        });
+      }
+
+      function schedulePreview() {
+        if (previewTimer) { clearTimeout(previewTimer); }
+        previewTimer = setTimeout(function () {
+          previewTimer = null;
+          fetchPreview();
+        }, 220);
+      }
+
+      // ---------- 表单 ----------
+
+      function readForm() {
+        return {
+          name: $('name').value,
+          tagline: $('tagline').value,
+          species: $('species').value,
+          age_label: $('ageLabel').value,
+          self_ref: $('selfRef').value,
+          world: $('world').value,
+          appearance: $('appearance').value,
+          traits: collectTraits(),
+          speech_style: linesOf('speechStyle'),
+          speech_rules: linesOf('speechRules'),
+          stages: collectStages(),
+          bottom_line: {
+            principle: $('blPrinciple').value,
+            floor: $('blFloor').value,
+            repair: linesOf('blRepair'),
+            forbidden: linesOf('blForbidden')
+          }
+        };
+      }
+
+      function fill(card) {
+        $('name').value = card.name || '';
+        $('tagline').value = card.tagline || '';
+        $('species').value = card.species || '';
+        $('ageLabel').value = card.age_label || '';
+        $('selfRef').value = card.self_ref || '';
+        $('world').value = card.world || '';
+        $('appearance').value = card.appearance || '';
+
+        var speech = card.speech || {};
+        setLines('speechStyle', speech.style || []);
+        setLines('speechRules', speech.rules || []);
+
+        var bottom = card.bottom_line || {};
+        $('blPrinciple').value = bottom.principle || '';
+        $('blFloor').value = bottom.floor || '';
+        setLines('blRepair', bottom.repair || []);
+        setLines('blForbidden', bottom.forbidden || []);
+
+        renderTraits(card.traits || {});
+        renderStages(card.stages || []);
+        $('sourceBadge').textContent = '来源 · ' + (card.source || '内置');
+        localPreview();
+      }
+
+      function loadCard() {
+        setStatus('读取人设…', false);
+        request(API).then(function (card) {
+          fill(card);
+          setStatus('', false);
+          fetchPreview();
+        }).catch(function (err) {
+          setStatus('读取失败：' + err.message, true);
+        });
+      }
+
+      function saveCard() {
+        var btn = $('btnSave');
+        btn.disabled = true;
+        setStatus('保存中…', false);
+        request(API, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(readForm())
+        }).then(function (res) {
+          if (res.card) { fill(res.card); }
+          var msg = '已保存，下一句话就生效';
+          if (res.backup) { msg += '（旧版备份：' + String(res.backup).split(/[\\/]/).pop() + '）'; }
+          setStatus(msg, false);
+          fetchPreview();
+        }).catch(function (err) {
+          setStatus('保存失败：' + err.message, true);
+        }).finally(function () {
+          btn.disabled = false;
+        });
+      }
+
+      function download(blob, filename) {
+        var link = document.createElement('a');
+        var href = URL.createObjectURL(blob);
+        link.href = href;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () {
+          URL.revokeObjectURL(href);
+          link.remove();
+        }, 0);
+      }
+
+      function exportCard() {
+        setStatus('导出中…', false);
+        fetch(withToken(EXPORT_URL), { headers: authHeaders() }).then(function (res) {
+          if (!res.ok) { throw new Error('HTTP ' + res.status); }
+          var header = res.headers.get('content-disposition') || '';
+          var match = /filename="?([^";]+)"?/.exec(header);
+          var filename = match ? match[1] : 'persona-card.json';
+          return res.blob().then(function (blob) {
+            download(blob, filename);
+            setStatus('已导出 ' + filename, false);
+          });
+        }).catch(function (err) {
+          setStatus('导出失败：' + err.message, true);
+        });
+      }
+
+      function importCard(file) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var payload;
+          try {
+            payload = JSON.parse(String(reader.result || ''));
+          } catch (e) {
+            setStatus('导入失败：这个文件不是合法 JSON', true);
+            return;
+          }
+          setStatus('导入中…', false);
+          request(IMPORT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payload: payload })
+          }).then(function (res) {
+            if (res.card) { fill(res.card); }
+            var msg = '已导入，下一句话就生效';
+            if (res.backup) { msg += '（旧版备份：' + String(res.backup).split(/[\\/]/).pop() + '）'; }
+            setStatus(msg, false);
+            fetchPreview();
+          }).catch(function (err) {
+            setStatus('导入失败：' + err.message, true);
+          });
+        };
+        reader.onerror = function () {
+          setStatus('导入失败：读不了这个文件', true);
+        };
+        reader.readAsText(file, 'utf-8');
+      }
+
+      // ---------- 绑定 ----------
+
+      $('btnSave').addEventListener('click', saveCard);
+      $('btnExport').addEventListener('click', exportCard);
+      $('btnImportPick').addEventListener('click', function () { $('importFile').click(); });
+      $('importFile').addEventListener('change', function (event) {
+        var files = event.target.files;
+        var file = files && files[0];
+        event.target.value = '';
+        if (file) { importCard(file); }
+      });
+
+      $('btnAddStage').addEventListener('click', function () {
+        $('stagesBody').appendChild(stageRow({ key: '', label: '', at: 0, call_user: '' }));
+        localPreview();
+      });
+
+      $('editForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        saveCard();
+      });
+      $('editForm').addEventListener('input', localPreview);
+      $('editForm').addEventListener('change', localPreview);
+
+      $('pvAffinity').addEventListener('input', function () {
+        $('pvAffinityVal').textContent = $('pvAffinity').value;
+        localPreview();
+        schedulePreview();
+      });
+      $('pvRole').addEventListener('change', function () {
+        localPreview();
+        schedulePreview();
+      });
+
+      loadCard();
+    })();
+  </script>
+</body>
+</html>

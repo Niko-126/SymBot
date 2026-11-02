@@ -1,0 +1,2 @@
+{"id":"act_workday_commute_01","kind":"activity","day_type":"workday","activity_type":"commute","time_of_day":"early_morning","duration_min":45,"location":"transit","alone":true,"energy":3,"synthetic":true,"note":"合成样本：早高峰地铁通勤，全程戴耳机"}
+{"id":"act_restday_meal_01","kind":"activity","day_type":"restday","activity_type":"meal","time_of_day":"noon","duration_min":40,"location":"home","alone":false,"energy":4,"synthetic":true,"note":"合成样本：休息日在家做午饭，边吃边聊天"}

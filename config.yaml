@@ -1,0 +1,130 @@
+# SymBot · 衡忆数字生命 · 内核配置
+#
+# 运行环境（重要）：
+#   test  = **发布默认**。用独立测试库 data/test-life.db，关掉 OneBot/语音/热梗抓取，
+#           clone 下来直接跑，绝不动你已有的库、也不会替你往 QQ 里发东西。
+#   prod  = 正式使用。用 store.db_path 指定的真实库，通道按下面各段开关。
+# 环境变量 SYMEM_ENV 可覆盖（SYMEM_ENV=prod 即正式）。
+environment: test
+
+# SymBot（衡忆数字生命）内核配置
+# 环境变量可覆盖本文件：新名 SYMEM_* 优先（如 SYMEM_BASE_URL / SYMEM_API_KEY / SYMEM_MODEL /
+# SYMEM_PORT / SYMEM_DB / SYMEM_MOCK），母体旧名 AI_LIFE_* 永远兼容（测试基线靠它跑）。
+
+server:
+  host: 127.0.0.1
+  port: 8787
+
+provider:
+  # 留空 = mock 模式，无需 Key 即可跑通全流程（回复由本地模拟）
+  # 默认接硅基流动的 DeepSeek-V4.1-Flash（原生多模态，能看图）；换官方纯文本端点就改这三行
+  base_url: https://api.siliconflow.cn/v1
+  api_key: ""
+  model: deepseek-ai/DeepSeek-V4.1-Flash
+  # 后台任务（记忆抽取/摘要）用的便宜模型，留空则同上
+  small_model: ""
+  # 全局强制模型：非空时所有任务都走它（聊天/摘要/评估/反思），不走风格路由
+  force_model: ""
+  temperature: 0.85
+  max_tokens: 400
+  timeout_s: 60
+
+context:
+  # 模型上下文窗口（按你选的模型改）
+  window: 64000
+  reserve_output: 1024
+  # 工作记忆策略：budget = 固定预算（推荐），ratio = 按窗口比例
+  mode: budget
+  budget: 6000          # 工作集目标 tokens
+  trigger: 5000         # 超过就压缩
+  hard_cap: 8000        # 超过就降级
+  keep_recent: 12       # 永远保留原文的轮数
+  verbatim_max: 30      # 未压缩原文上限（超过就折成线索）
+  degrade: false        # 降级：默认关闭，触顶后才开
+
+  # 水位线（mode=ratio 时生效）
+  warn_ratio: 0.55
+  force_ratio: 0.75
+  hard_ratio: 0.90
+
+store:
+  db_path: data/test-life.db
+  media_dir: data/media
+
+persona:
+  # qq-group 分支默认用鲸鱼娘人设（小鲸）
+  # 主线（main）用 persona/whale-girl.yaml（小涵）
+  path: persona/whale-chan.yaml
+
+life:
+  timezone: Asia/Shanghai
+
+# 开发者开关：开启后才能手动设定好感、强制新建会话。
+# 以后加口令/多因子验证，只换验证方式，这个开关不动。
+# 口令留空 = 开发者接口全部 403（公开仓库不预置任何口令）。
+# 本机自用：在 config.local.yaml（不入库）里写 developer.key，或设环境变量 SYMEM_DEVELOPER_KEY。
+developer:
+  enabled: true
+  key: ""              # 连点 LOGO 12 次后输入这个口令；留空则等于关闭开发者接口
+  logo_taps: 12
+
+# 体验层（先留结构，不实现）
+experience:
+  notification: true    # 桌面通知
+  autostart: false      # 开机自启
+  floating_window: false # 悬浮窗
+
+# 热梗自动抓取（路线 A）：真实 provider 下后台每天抓一轮 B站热梗评论；
+# mock / 无 key 时永远跳过（离线测试不联网）。状态见 GET /v1/trend/stats 的 harvest 段。
+trend:
+  harvest_enabled: true
+  interval_hours: 24
+  limit: 20
+
+# 亲密模块总开关 + R 级插件启用位。
+# enabled: false = 整块亲密模式关闭（模式永远 OFF），也等于禁用 app/intimacy/r18/ 插件。
+# 其余字段是安全阀与分级上限，默认值按"最保守也可用"给。
+intimacy:
+  enabled: true
+  non_lover_deflect: true   # 非恋人 + 性意图 → 调侃拒绝
+  kinship_block: true       # 家人（生父/干爹）永不进入
+  minor_block: true         # 自称未成年 → 永不进入
+  safeword: true            # 红黄绿灯：红灯当轮停干净、黄灯降速
+  aftercare: true           # 退出直白后必须给事后照护
+  group_max_stage: 2        # 群聊最高 L2（明示），直白永远不给
+  private_max_stage: 5      # 私聊恋人最高 L5
+  max_consecutive_explicit: 2
+  sensory_check: true
+# 工具环节：联网工具（查资料 / 读链接）+ 识图工具（看用户发来的图）。
+# mock 模式或 tools.enabled=false 时**永不出网**（测试零联网、零花费）。
+tools:
+  enabled: true
+  web:
+    enabled: true
+    max_results: 5
+    timeout_s: 8.0
+    max_chars: 1500
+    allow_hosts: []          # 空 = 不限制；填了就只允许这些域名（含子域）
+  # 群聊里要不要调工具（默认关：群里人多，搜索/识图容易烧钱）
+  group_enabled: false
+  vision:
+    enabled: true
+    # 视觉可以走另一家：base_url/api_key 留空 = 跟 provider 同端点同 key
+    base_url: ""
+    api_key: ""
+    model: ""                # 留空 = 跟 provider.model 一致；看图建议显式指定视觉模型
+    max_tokens: 400
+    timeout_s: 20.0
+    max_images: 2
+# 文字转语音（TTS）：对接本地「声音服务」（肥鱼声音插件同一套 HTTP 契约）。
+# 服务端是第三方项目、不随本仓库分发：scripts/fetch_voice_service.ps1 自己拉。
+# 默认关。开 send_in_chat = 合成完直接把语音发进聊天（仅 OneBot 通道）。
+voice:
+  enabled: false
+  base_url: http://127.0.0.1:9880
+  api_key: ""
+  voice: feiyu
+  style: cute
+  timeout_s: 60.0
+  max_chars: 200
+  send_in_chat: false
