@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN" data-sv-theme="paper" data-symvolve-scaffold="dashboard">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>SymBot</title>
+<style>
+  :root {
+    --sv-color-ink: #0B0C0E;
+    --sv-color-paper: #F2F2EF;
+    --sv-color-steel: #9AA0A6;
+    --sv-color-signal: #00E0C6;
+    --sv-font-zh: "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+    --sv-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--sv-color-paper);
+    color: var(--sv-color-ink);
+    font-family: var(--sv-font-zh);
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: 28px 32px 20px;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+  }
+  .stage { display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+  .sigma {
+    font-family: var(--sv-font-mono);
+    font-size: 64px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--sv-color-ink);
+    letter-spacing: -0.02em;
+    animation: sv-in 620ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  .sigma::after {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: 14px;
+    border-radius: 9999px;
+    background: var(--sv-color-signal);
+    vertical-align: 0.55em;
+    animation: sv-pulse 1.6s ease-in-out infinite;
+  }
+  .wordmark {
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    animation: sv-in 620ms cubic-bezier(0.2, 0, 0, 1) 120ms both;
+  }
+  .wordmark span { color: var(--sv-color-steel); font-size: 11px; margin-left: 8px; letter-spacing: 0.04em; }
+  .status {
+    font-family: var(--sv-font-mono);
+    font-size: 11px;
+    color: var(--sv-color-steel);
+    letter-spacing: 0.02em;
+    animation: sv-in 620ms cubic-bezier(0.2, 0, 0, 1) 240ms both;
+  }
+  .bar { height: 2px; width: 100%; background: var(--sv-color-steel); opacity: 0.3; overflow: hidden; }
+  .bar i {
+    display: block;
+    height: 100%;
+    width: 38%;
+    background: var(--sv-color-ink);
+    animation: sv-load 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  @keyframes sv-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes sv-pulse {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+  @keyframes sv-load {
+    0% { transform: translateX(-110%); }
+    100% { transform: translateX(280%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sigma, .wordmark, .status { animation: none; opacity: 1; transform: none; }
+    .sigma::after, .bar i { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="sigma">Σ</div>
+    <div class="wordmark">SymBot<span>衡忆数字生命</span></div>
+    <div class="status" id="status">正在启动内核…</div>
+  </div>
+  <div class="bar"><i></i></div>
+</body>
+</html>

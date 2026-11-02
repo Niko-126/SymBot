@@ -19,6 +19,7 @@ const BOOT_TIMEOUT_MS = 45_000
 const ASSETS = path.join(__dirname, 'assets')
 
 let win = null
+let splash = null
 let tray = null
 let quitting = false
 let kernel = null // 只有自己 spawn 的内核才记在这里；外挂内核保持 null
@@ -309,6 +310,30 @@ async function restartKernel() {
 
 // ---------------------------------------------------------------- 窗口 / 托盘
 
+function createSplash() {
+  splash = new BrowserWindow({
+    width: 520,
+    height: 300,
+    frame: false,
+    resizable: false,
+    maximizable: false,
+    minimizable: false,
+    show: true,
+    alwaysOnTop: true,
+    backgroundColor: '#F2F2EF',
+    webPreferences: { contextIsolation: true, nodeIntegration: false },
+  })
+  splash.loadFile(path.join(__dirname, 'splash.html'))
+  splash.on('closed', () => { splash = null })
+}
+
+function closeSplash() {
+  if (splash) {
+    try { splash.close() } catch { /* 已经关了 */ }
+    splash = null
+  }
+}
+
 function createWindow() {
   win = new BrowserWindow({
     width: 1280,
@@ -436,15 +461,18 @@ if (!app.requestSingleInstanceLock()) {
 
   app.whenReady().then(async () => {
     app.setAppUserModelId('com.symbot.desktop')
+    createSplash()
     seedAssets()
     registerIpc()
     const result = await boot()
     if (!result.ok) {
+      closeSplash()
       app.quit()
       return
     }
     createWindow()
     createTray()
+    closeSplash()
   })
 
   app.on('before-quit', () => {
