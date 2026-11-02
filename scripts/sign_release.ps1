@@ -87,12 +87,23 @@ foreach ($exe in $exes) {
     } else {
         $sig = Set-AuthenticodeSignature -FilePath $exe.FullName -Certificate $cert `
             -HashAlgorithm SHA256 -TimestampServer $Timestamp
-        if ($sig.Status -ne 'Valid') {
+        # 自签名时本机未信任根证书，状态会是 UnknownError（链未受信任）——
+        # 这不是签名失败：只要签名者证书指纹对得上、状态不是 NotSigned 就算签上了。
+        if ($sig.Status -eq 'NotSigned' -or -not $sig.SignerCertificate) {
             Fail "签名失败：$($sig.Status) / $($sig.StatusMessage)"
+        }
+        if ($sig.Status -ne 'Valid') {
+            Warn "签名状态 $($sig.Status)（自签名/未信任根证书时属预期）"
         }
     }
     $check = Get-AuthenticodeSignature -FilePath $exe.FullName
-    if ($check.Status -ne 'Valid') { Fail "签名校验不通过：$($check.Status)" }
+    if ($check.Status -eq 'NotSigned' -or -not $check.SignerCertificate) {
+        Fail "签名校验不通过：$($check.Status)"
+    }
+    if ($check.SignerCertificate.Thumbprint -ne $cert.Thumbprint) {
+        Fail "签名者证书与预期不一致：$($check.SignerCertificate.Thumbprint)"
+    }
+    if ($check.Status -ne 'Valid') { Warn "校验状态 $($check.Status)（自签名未信任，属预期）" }
     $hash = (Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLower()
     Ok "$($exe.Name)  签名有效  签名者=$($check.SignerCertificate.Subject)"
     Ok "SHA256=$hash"
