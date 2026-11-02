@@ -1180,3 +1180,78 @@ def service_quick_list() -> dict[str, Any]:
     from app.core import napcat_webui
 
     return {"items": napcat_webui.quick_login_list()}
+
+
+# ---------------------------------------------------------------- 运行环境 / 记忆内核
+#
+# owner 2026-11-02 问的："记忆系统集成在里面了吗、加密了吗、面板看得到这些依赖吗"。
+# 这一条接口就是把答案摊在面板上：内核从哪来（源码/加密容器）、版本、容器指纹、库多大、
+# 依赖缺哪个。全部只读，不改任何东西。
+
+
+@router.get("/env")
+def env_status() -> dict[str, Any]:
+    """运行环境：依赖自检 + 记忆内核来源/加密容器 + 数据库规模。"""
+    from app.core import deps
+    from app.core.paths import DATA_ROOT
+
+    payload: dict[str, Any] = {"ok": True, "deps": deps.check(), "memory": {}}
+    rt = get_runtime()
+    db_file = rt.cfg.db_file
+    mem: dict[str, Any] = {
+        "db": str(db_file),
+        "db_bytes": 0,
+        "origin": "",
+        "version": "",
+        "vault": {},
+        "stats": {},
+        "ok": False,
+        "encrypted": False,
+    }
+    try:
+        mem["db_bytes"] = int(db_file.stat().st_size) if db_file.exists() else 0
+    except OSError:
+        pass
+    try:
+        from app.memory import api as mem_api
+
+        info = mem_api.core_info()
+        mem.update({
+            "ok": bool(info.get("ok")),
+            "origin": str(info.get("origin") or ""),
+            "version": str(info.get("version") or ""),
+            "error": str(info.get("error") or ""),
+            "cause": str(info.get("cause") or ""),
+            "forced_vault": bool(info.get("forced_vault")),
+        })
+        mem["encrypted"] = mem["origin"] == "vault"
+    except Exception as exc:  # noqa: BLE001 - 探测失败只影响这张卡
+        mem["error"] = f"{type(exc).__name__}: {exc}"
+    try:
+        from app.memory import _loader
+
+        vault = _loader.inspect_vault()
+        mem["vault"] = {
+            "path": str(vault.get("path") or ""),
+            "bytes": int(vault.get("bytes") or 0),
+            "sha256": str(vault.get("sha256") or ""),
+            "files": int(vault.get("files") or 0),
+            "mode": str(vault.get("mode") or ""),
+            "iters": int(vault.get("iters") or 0),
+            "format": int(vault.get("version") or 0),
+        }
+    except Exception as exc:  # noqa: BLE001 - 源码态没有容器是正常的
+        mem["vault"] = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
+    try:
+        from app.memory import h2
+
+        stats = h2.memory_stats()
+        mem["stats"] = {
+            "total": int(stats.get("total") or 0),
+            "by_kind": stats.get("by_kind") or {},
+        }
+    except Exception:  # noqa: BLE001
+        mem["stats"] = {}
+    payload["memory"] = mem
+    payload["paths"] = {"data_root": str(DATA_ROOT)}
+    return payload

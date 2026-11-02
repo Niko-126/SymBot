@@ -40,6 +40,13 @@ class ToggleIn(BaseModel):
     enabled: bool
 
 
+class InstallIn(BaseModel):
+    """面板「下载安装」：贴 GitHub 链接 / owner/repo / zip 直链都行。"""
+
+    url: str = ""
+    force: bool = False
+
+
 def _find(module_id: str) -> modules_mod.ModuleInfo | None:
     for info in modules_mod.discover():
         if info.id == module_id:
@@ -58,6 +65,34 @@ def list_modules(request: Request) -> dict[str, Any]:
 def reload_modules(request: Request) -> dict[str, Any]:
     """重新扫目录 + 重新 import，热生效；不需要重启内核。"""
     return modules_mod.reload(app=request.app)
+
+
+@router.post("/modules/install")
+def install_module(body: InstallIn, request: Request) -> dict[str, Any]:
+    """从链接下载并安装一个模块（不用会 git、不用手动解压）。
+
+    失败返回 400 + 人话原因：地址不对、包结构不对、已装过（除非 force）、entry 不存在。
+    装完立刻热重载，新模块的接口当场可用。
+    """
+    from app.core import module_install
+
+    try:
+        result = module_install.install_from_url(body.url, force=bool(body.force))
+    except module_install.InstallError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001 - 兜底：不许 500 成白屏
+        raise HTTPException(status_code=500, detail=f"安装失败：{type(exc).__name__}: {exc}") from exc
+    loaded = modules_mod.reload(app=request.app)
+    return {
+        "ok": True,
+        **result,
+        "reload": {
+            "ok": bool(loaded.get("ok")),
+            "total": int(loaded.get("total") or 0),
+            "loaded": loaded.get("loaded") or [],
+            "failed": loaded.get("failed") or [],
+        },
+    }
 
 
 @router.post("/modules/{module_id}/toggle")

@@ -551,6 +551,21 @@
     .svc-qr img { width: 208px; height: 208px; image-rendering: pixelated; background: #fff; border-radius: var(--sv-radius-sm); }
     .svc-qr p { font-size: var(--sv-text-micro); color: var(--sv-text-secondary); text-align: center; line-height: var(--sv-leading-caption); }
 
+    .svc-install { display: flex; align-items: center; gap: var(--sv-space-8); flex-wrap: wrap; }
+    .svc-install input[type="text"] {
+      flex: 1 1 160px;
+      min-width: 0;
+      padding: var(--sv-space-4) var(--sv-space-8);
+      border: var(--sv-border-width-thin) solid var(--sv-border-divider);
+      border-radius: var(--sv-radius-sm);
+      background: var(--sv-surface-sunken);
+      color: var(--sv-text-primary);
+      font-size: var(--sv-text-caption);
+    }
+    .svc-check { display: inline-flex; align-items: center; gap: var(--sv-space-4); font-size: var(--sv-text-micro); color: var(--sv-text-secondary); white-space: nowrap; }
+    .svc-ok { color: var(--sv-status-done); }
+    .svc-bad { color: var(--sv-status-failed); }
+
     .svc-modules { display: flex; flex-direction: column; gap: var(--sv-space-4); margin: 0; padding: 0; }
     .svc-mod {
       display: flex;
@@ -1065,9 +1080,43 @@
         <div class="svc-actions">
           <button type="button" class="btn btn--sm" id="svcModulesReload">重新加载</button>
         </div>
+        <div class="svc-install">
+          <input type="text" id="svcModuleUrl" placeholder="GitHub 链接 / owner/repo / zip 直链" autocomplete="off" spellcheck="false">
+          <label class="svc-check"><input type="checkbox" id="svcModuleForce"> 覆盖</label>
+          <button type="button" class="btn btn--sm" id="svcModuleInstall">下载安装</button>
+        </div>
         <p class="status" id="svcModulesStatus" role="status" hidden></p>
         <ul class="svc-modules" id="svcModulesList"></ul>
-        <p class="svc-note">把模块目录丢进 modules/&lt;id&gt;/ 就生效（manifest.json 写清 id/entry）。模块代码跑在内核进程里，只装信得过的。</p>
+        <p class="svc-note">贴 GitHub 地址或 <code>owner/repo</code> 直接装，不用会 git；也可以手动把目录丢进 modules/&lt;id&gt;/。模块代码跑在内核进程里，只装信得过的。</p>
+      </section>
+
+      <section class="svc-item" aria-labelledby="svcMemName">
+        <div class="svc-row">
+          <i class="svc-dot" id="svcMemDot" data-state="unknown" aria-hidden="true"></i>
+          <span class="svc-name" id="svcMemName">记忆内核</span>
+          <span class="svc-detail mono" id="svcMemOrigin">—</span>
+        </div>
+        <div class="svc-kv">
+          <span>版本：<b id="svcMemVersion">—</b></span>
+          <span>加密容器：<b id="svcMemVault">—</b></span>
+          <span>记忆条数：<b id="svcMemCount">—</b></span>
+          <span>库大小：<b id="svcMemDb">—</b></span>
+        </div>
+        <p class="svc-note" id="svcMemNote">源码在仓库里时显示「vendor 源码」，只有加密容器时显示「已加密（机器绑定）」。</p>
+      </section>
+
+      <section class="svc-item" aria-labelledby="svcEnvName">
+        <div class="svc-row">
+          <i class="svc-dot" id="svcEnvDot" data-state="unknown" aria-hidden="true"></i>
+          <span class="svc-name" id="svcEnvName">运行环境</span>
+          <span class="svc-detail mono" id="svcEnvPython">—</span>
+        </div>
+        <div class="svc-kv" id="svcEnvRequired"></div>
+        <div class="svc-kv" id="svcEnvOptional"></div>
+        <div class="svc-actions">
+          <button type="button" class="btn btn--sm" id="svcEnvReload">重新检测</button>
+        </div>
+        <p class="svc-note">必装缺了内核起不来；可选缺了只影响对应功能（翻唱/PDF/更准的 token 估算）。</p>
       </section>
     </div>
   </aside>
@@ -3504,6 +3553,7 @@
         svc.open = true;
         loadServiceStatus(false);
         loadModules(true);
+        loadEnvCard(true);
         if (svc.timer) clearInterval(svc.timer);
         svc.timer = setInterval(function () {
           if (!svc.open) return;
@@ -3564,6 +3614,74 @@
         }
       }
 
+      async function svcInstallModule() {
+        var url = ($('svcModuleUrl').value || '').trim();
+        if (!url) {
+          setStatus('svcModulesStatus', '先在输入框里贴 GitHub 地址或 owner/repo', true);
+          return;
+        }
+        setStatus('svcModulesStatus', '下载安装中…（大仓库要十几秒）', false);
+        try {
+          var r = await api('/v1/console/modules/install', {
+            method: 'POST',
+            body: { url: url, force: !!$('svcModuleForce').checked }
+          });
+          setStatus('svcModulesStatus',
+            '装好了：' + txt(r.id) + (r.version ? ' v' + r.version : '') +
+            (r.backup ? '（旧版已备份）' : '') + ' · 共 ' + txt(r.total || 1) + ' 个模块', false);
+          $('svcModuleUrl').value = '';
+          await loadModules(true);
+        } catch (err) {
+          showError('svcModulesStatus', '安装失败：', err);
+        }
+      }
+
+      async function loadEnvCard(silent) {
+        try {
+          var d = await api('/v1/console/env');
+          var m = d.memory || {};
+          var dep = d.deps || {};
+          var origin = String(m.origin || '');
+          setDot('svcMemDot', m.ok ? (origin === 'vault' ? 'ok' : 'warn') : 'bad');
+          $('svcMemOrigin').textContent = origin === 'vault'
+            ? '已加密 · 容器运行'
+            : (origin === 'vendor' ? 'vendor 源码' : (m.error ? '不可用' : '—'));
+          $('svcMemVersion').textContent = m.version || '—';
+          var v = m.vault || {};
+          if (v.error) {
+            $('svcMemVault').textContent = '无（源码态）';
+          } else if (v.bytes) {
+            var kb = Math.max(1, Math.round(Number(v.bytes) / 1024));
+            $('svcMemVault').textContent = kb + ' KB · ' + txt(v.files) + ' 文件 · ' + (v.mode === 'machine' ? '机器绑定' : txt(v.mode));
+          } else {
+            $('svcMemVault').textContent = '—';
+          }
+          $('svcMemCount').textContent = (m.stats && m.stats.total !== undefined) ? String(m.stats.total) : '—';
+          $('svcMemDb').textContent = m.db_bytes ? (Math.max(1, Math.round(Number(m.db_bytes) / 1024)) + ' KB') : '—';
+          $('svcMemNote').textContent = origin === 'vault'
+            ? '内核从加密容器解出（临时目录，进程退出即擦除），源码不在仓库里。'
+            : '源码在仓库里（开发态）。发布版只带加密容器，这一格会显示「已加密」。';
+
+          setDot('svcEnvDot', dep.ok ? 'ok' : 'bad');
+          $('svcEnvPython').textContent = 'Python ' + txt(dep.python);
+          function renderDeps(box, items, withWhy) {
+            clearNode(box);
+            (items || []).forEach(function (it) {
+              var chip = el('span', 'mono ' + (it.ok ? 'svc-ok' : 'svc-bad'),
+                (it.ok ? '✓ ' : '✗ ') + it.package + (it.version ? ' ' + it.version : ''));
+              if (withWhy && !it.ok) chip.title = it.why || '';
+              box.appendChild(chip);
+            });
+          }
+          renderDeps($('svcEnvRequired'), dep.required, false);
+          renderDeps($('svcEnvOptional'), dep.optional, true);
+        } catch (err) {
+          if (!silent) showError('svcStatus', '读环境信息失败：', err);
+          setDot('svcEnvDot', 'bad');
+          setDot('svcMemDot', 'bad');
+        }
+      }
+
       function closeService() {
         $('svcDrawer').hidden = true;
         $('svcScrim').hidden = true;
@@ -3603,6 +3721,8 @@
         $('svcVoiceRestart').addEventListener('click', function () { svcAction('voice', 'restart', '重启语音服务'); });
         $('svcVoiceLogBtn').addEventListener('click', svcLoadLog);
         $('svcModulesReload').addEventListener('click', svcReloadModules);
+        $('svcModuleInstall').addEventListener('click', svcInstallModule);
+        $('svcEnvReload').addEventListener('click', function () { loadEnvCard(false); });
       }
 
       function init() {

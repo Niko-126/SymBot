@@ -1,161 +1,147 @@
 # SymBot · 衡忆数字生命
 
-> 一个能自己住着的对话智能体：**有性格、有记忆、有作息、有关系状态**，换模型 / 换机器 / 换聊天平台而仍然是她。
+> 一个**住在你电脑里**的对话智能体：有记忆、有关系、有作息、有脾气，换模型 / 换机器 / 换聊天平台，
+> 她还是她。
 
-单机、本地优先、只认 OpenAI 兼容接口；全部数据落一个 SQLite 文件。
-
-> **发布默认 = 测试环境（environment: test）**：独立测试库 data/test-life.db，OneBot / 语音 / 热梗抓取全部关闭。
-> 想正式用，把 config.yaml 里 environment 改成 prod（或用 SYMEM_ENV=prod），再在面板「设置 → 连接」填自己的 key 与小号。
+单机运行、本地优先、只连 OpenAI 兼容接口；全部数据落一个 SQLite 文件，随时能打包带走。
 
 ```text
-Python 3.14 · FastAPI · SQLite(WAL) · 纯静态面板
-195 个 Python 文件 / 63,611 行 · 127 个 HTTP 操作 · 37 张业务表 + 1 视图
+Python 3.11+ · FastAPI · SQLite(WAL) · 纯静态面板（无前端框架、无构建步骤）
 ```
 
-## 它是什么
+---
 
-不是聊天机器人外壳，也不是 RAG 套壳：
+## 一、它是什么
 
-| 它有 | 它没有 |
+不是聊天框外壳，也不是 RAG 套壳。四件事是它的骨架：
+
+| 能力 | 说明 |
 |---|---|
-| **记忆**：vendored 记忆引擎（热度、线索、遗忘、压缩、软合并）+ 唯一写入口 `h2.add()` | 前端框架 / 构建步骤（面板是 4 个纯静态页） |
-| **关系**：四维数值 × 两套账 × 六阶段 × 唯一恋人，唯一结算入口 `apply_appraisal()` | ORM（全部手写 SQL） |
-| **人格**：YAML 人格包（22 个顶层键、8 维性格、9 段作息） | 云端依赖（只在调模型、查词、抓梗时出网） |
-| **作息**：清醒度模型（她会困、会醒、越聊越精神）、日记、夜里念头 | 多机部署 / 分布式（单进程单例） |
-| **通道**：一套内核，面板 / QQ 官方 bot / OneBot 三个入口，能力位自报 | 语义去重（记忆去重是**文本完全相等**） |
-| **验收**：对抗式测试底座（1,893 条 Item / 127 路由逐条打 / 双 AI 互聊 / 22 条裁判规则） | — |
-| **工具**：联网查资料 / 读链接 / 看用户发来的图（`app/tools/`，mock 下**永不出网**） | — |
+| **记忆** | 独立记忆引擎：热度衰减、线索召回、压缩、软合并、遗忘。所有写入只走一个入口，可导出可迁移 |
+| **关系** | 四维数值（好感/信任/吸引/反感）× 六阶段 × 唯一恋人；表白、分手、吃醋、和好都有确定性规则兜底 |
+| **人格** | YAML 人格包：性格 8 维、说话规则、阶段称呼表、边界词；面板里能改，改完立刻生效 |
+| **作息** | 清醒度模型：她会困、会醒、越聊越精神；有日记、有夜里冒出来的念头、会主动找你说话 |
 
-## 快速开始
+外加一层**可插拔的工具与通道**：
+
+- **通道**：面板直聊 / QQ（通过 NapCat 的 OneBot v11）/ QQ 官方机器人，一套内核三个入口
+- **工具**：联网查资料、读链接、看图（mock 模式下永不出网）
+- **语音**：接本地 TTS 服务合成语音条；点歌、翻唱（需要额外的第三方服务）
+- **控制台**：服务状态与启停、登录二维码、记忆浏览、关系上限、人设卡编辑，全在浏览器里
+
+## 二、三个版本，按需取用
+
+| 版本 | 里面有什么 | 体积 | 适合谁 |
+|---|---|---|---|
+| **Core（纯本体）** | 程序 + 加密记忆内核 + 面板 + 文档 | ~5 MB | 只要程序，素材/语音自己配；放服务器、塞进自己项目 |
+| **Standard（本体 + 资源）** | Core + 表情包 + 语音触发素材 | ~93 MB | 想开箱就有表情包和现成语音条 |
+| **Full（完整整合包）** | Standard + 本地 TTS 服务 + 桌面安装包 | ~9.4 GB | 上不了 GitHub、想一次装齐的人 |
+
+三个版本**代码完全一样**，区别只在附带资源。升级时替换程序文件、保留 `data/` 即可。
+
+> 第三方权重（CosyVoice / RVC / 表情包素材）不在本项目许可范围内，各自遵守上游条款；
+> 具体见 `NOTICE.md`。
+
+## 三、30 秒上手
 
 ```powershell
-py -3.14 -m venv .venv
-$py = ".\.venv\Scripts\python.exe"
+# 1) 需要 Python 3.11+（3.11–3.14 都测过）
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 
-& $py -m pip install -r requirements.txt     # 6 个依赖
-& $py -m app.cli serve --port 8787           # 内核 + 面板 → http://127.0.0.1:8787/
+# 2) 启动（默认测试环境：独立测试库、不连 QQ、不发消息）
+.\.venv\Scripts\python.exe -m app.cli serve --port 8787
+
+# 3) 浏览器打开
+start http://127.0.0.1:8787/
 ```
 
-没有 key 也能跑（mock 模式，全链路离线）：
+Windows 用户可以直接双击 `安装依赖.bat` → `一键启动.bat`。
 
-```powershell
-$env:SYMEM_MOCK = "1"                        # 只认字符串 "1"
-& $py -m app.cli serve
-```
+**没有 API Key 也能跑**：默认就是 mock 模式，全链路离线，面板、记忆、关系、日程都能玩；
+只是回答来自本地语料而不是模型。
 
-有 key 时写 `config.local.yaml`（**不入库**）：
+填 Key 的地方只有一处：面板「设置 → 连接 → 模型」，填完立即生效，不需要重启。
+
+## 四、环境：测试与正式
+
+`config.yaml` 里第一行就是开关：
 
 ```yaml
-provider:
-  base_url: https://api.siliconflow.cn/v1
-  api_key: sk-你的key
-  model: deepseek-ai/DeepSeek-V4.1-Flash
+environment: test    # 发布默认：独立库 data/test-life.db，OneBot/语音/热梗抓取全关
+# environment: prod  # 正式使用：用 store.db_path 指定的库，通道按各段开关
 ```
 
-更多见 **[docs/01-quickstart.md](docs/01-quickstart.md)**。
+- **test**：clone 下来直接跑，**不会碰你已有的库，也不会替你往 QQ 里发东西**。适合试用、演示、二次开发。
+- **prod**：正式使用。改这一行（或设 `SYMEM_ENV=prod`），再在面板里填 key、小号、家人。
 
-## 架构一览
+数据全部在 `data/`：`life.db`（记忆+对话）、`stickers/`、`voices/`、`covers/`、日志。
+整个目录拷走就是搬家；`data/` 永远不进仓库。
 
-```text
-接入层   panel/（HTTP）· app/adapters/qq.py（botpy WS）· app/api/onebot.py（NapCat 上报）
-接口层   app/api/{routes,console,trend,group}.py        127 个操作 / 112 条路径模板
-主链层   app/mind/loop.py: chat_turn()   命名 → 恋爱 → 状态 → 关系/记忆 → 情绪 → prompt → 模型 → 守卫/写库
-领域层   memory · relation · intimacy · life · group · web · persona
-基础层   core/{config,paths,db,runtime,memengine,continuity,preflight,channel}
-引擎     vendor/symvolve_memory（vendored 只读）
-```
+## 五、面板一览
 
-一次对话的主链（`app/mind/loop.py`）：
-
-```text
-0.5 命名剧本 → 0.8 恋爱事件 → 1.5 状态策略（清醒度/延迟/句数）
-→ 2 关系与记忆召回 → 3 情绪与语料（锚点/语气层/热梗/陪伴）
-→ 4 prompt 组装（人设五段 + 关系 + 记忆 + 此刻状态 + 规则）
-→ 5 调模型 → 6 出戏守卫 → 切句 → 写 events → 写记忆 → 结算关系 → 留痕
-```
-
-详见 **[docs/02-architecture.md](docs/02-architecture.md)**。
-
-## 文档
-
-全套 24 章，一章一个主题，从"怎么跑"到"每个函数干什么"。
-后续改进方向与优先级见 **[ROADMAP.md](ROADMAP.md)**；当前要做的任务与并发分工见 **[TASKS.md](TASKS.md)**。
-
-| 章 | 内容 |
-|---|---|
-| [00](docs/00-overview.md) · [01](docs/01-quickstart.md) · [02](docs/02-architecture.md) | 总览 · 快速开始 · 架构分层 |
-| [03](docs/03-files.md) | **文件全表**（195 个 py 逐个列，行数/类/函数/职责） |
-| [04](docs/04-core.md) · [05](docs/05-mind.md) | 内核基础 · 对话主链 |
-| [06](docs/06-memory.md) · [07](docs/07-vendor-memory.md) | 记忆系统 · 引擎内部 |
-| [08](docs/08-relation.md) · [09](docs/09-intimacy.md) | 关系系统 · 亲密模式 |
-| [10](docs/10-life.md) · [11](docs/11-group.md) | 生活作息 · 群聊增强 |
-| [12](docs/12-api.md) · [13](docs/13-entry.md) | HTTP 接口（127 条）· 装配与入口 |
-| [14](docs/14-web.md) · [15](docs/15-lifecorpus.md) | 联网内容 · 语料管线 |
-| [16](docs/16-qa.md) · [17](docs/17-database.md) · [18](docs/18-config.md) | 测试底座 · 数据模型 · 配置全量 |
-| [19](docs/19-persona.md) · [20](docs/20-panel.md) · [21](docs/21-scripts.md) | 人格包 · 前端面板 · 脚本运维 |
-| [22](docs/22-testing.md) · [23](docs/23-boundaries.md) | 测试与验收 · 已知边界与红线 |
-
-## 测试
-
-```powershell
-$env:SYMEM_MOCK="1"; $env:PYTHONIOENCODING="utf-8"
-$py = ".\.venv\Scripts\python.exe"
-
-& $py scripts\adv_regress.py      # 31/31   已修缺陷回归 D1–D31
-& $py scripts\smoke.py            # 387/0   主基线（mock + 临时库）
-& $py scripts\fullcheck.py        # 150/150 + 路由 110/110，无 5xx（干净工作区 148/148，2 条按预期 SKIP）
-& $py scripts\test_intimacy.py    # 60/0    亲密状态机
-& $py scripts\test_lifecorpus.py  # 72/0    语料管线
-& $py scripts\humanity_check.py   # 27/27   拟人度（离线部分）
-& $py scripts\adv_full.py --phase all --levels L0,L1,L2   # 离线全量矩阵，零花费
-& $py scripts\verify_all.py       # 总控 10/10
-```
-
-当前基线（2026-11-01）**六个套件全绿**，实测快照与红项修法写在 **[docs/22-testing.md](docs/22-testing.md)** §3，不美化。
-
-真机联调脚本在 `scripts/live/`，流程见 [docs/22](docs/22-testing.md) §7。
-
-**语料出口**：`python scripts\export_corpus.py --stats` 看能导多少，不带参数导出到 `exports/`
-（一行一个 `{context, reply}` 训练对，只读库 + 手机号/身份证/邮箱脱敏）。见 [docs/21](docs/21-scripts.md)。
-
-## 目录
-
-```text
-app/       内核（core · mind · memory · relation · intimacy · life · group · api · adapters · web · lifecorpus · qa）
-panel/     4 个纯静态页（index / settings / console / trend）
-persona/   人格包 YAML（当前 whale-chan.yaml「小鲸」）
-vendor/    symvolve_memory（只读记忆引擎）
-scripts/   测试与运维（含 live/ 真机脚本）
-docs/      技术文档（24 章）
-data/      运行数据，不入库
-语料/      参考语料，只读
-```
-
-逐文件索引见 **[docs/03-files.md](docs/03-files.md)**。
-
-## 四条不能破的不变量
-
-1. **记忆写入只走 `app/memory/h2.py: add()`**。`memories` 是视图，不是表。
-2. **关系数值唯一入口 `app/relation/engine.py: apply_appraisal()`**。规则 40% + 模型 60%，单轮硬上限 ±3.5。
-3. **任何改变她状态的动作必须 `app/core/continuity.py: record()` 留痕。**
-4. **`import app.main` 有副作用**（建库、读人设、写 `kv`）——测试走 `app/qa/sandbox.py` 或子进程 + 临时 `SYMEM_DATA`。
-
-另外：`vendor/` 只读（升级=整目录覆盖）；`data/`、`Chat/`、`Girl-memory/`、`config.local.yaml` 永不入库。
-
-## 许可证
-
-**源码可见（source-available），但非开源。** 本仓库适用 **[SymBot 个人使用许可协议 1.0](LICENSE)**：
-
-| 用途 | 是否免费 | 说明 |
+| 页面 | 地址 | 能干什么 |
 |---|---|---|
-| 个人学习 / 研究 / 自用（非商业） | ✅ 免费 | 可运行、可改源码、可本地部署 |
-| 商业使用（企业内部生产、SaaS、集成进产品、代交付、招生收费） | ❌ 需授权 | 须事先取得作者书面商业授权 |
-| 二次分发 / 打包发行 / 镜像站 | ❌ 禁止 | 保留协议的 GitHub fork 用于个人学习除外 |
-| 用于训练模型 / 构建对外发布的数据集 | ❌ 需授权 | 见协议 3.4 |
-| 提交 PR / 贡献代码 | — | 视为授予作者可再许可的使用权（协议第五条） |
+| 对话 | `/` | 和她聊天、看她此刻的状态、切群聊/私聊 |
+| 控制台 | `/console.html` | 好友与关系、记忆浏览、AI 想法、**服务抽屉**（内核/NapCat/语音的启停 + 登录二维码 + 模块 + 记忆内核 + 依赖） |
+| 设置 | `/settings.html` | 模型 Key、小号 QQ、家人名单、NapCat 目录、语音地址、工具开关 |
+| 人设卡 | `/persona.html` | 人设正文/特质/阶段表/称呼表/边界词，右侧实时预览「她会怎么称呼你」，可导入导出 |
+| 热梗 | `/trend.html` | 从 B 站抓来的梗，喂给她当谈资（可关） |
 
-**商业授权联系：【待填：邮箱 / GitHub / TG】。**
+### 服务抽屉（最常用）
 
-协议全文见 [LICENSE](LICENSE)，中文文本为唯一具备法律效力的版本。
-`vendor/symvolve_memory/` 是作者另一项目「衡忆记忆核心 / SyMemory-Core」的只读副本，随本协议一并授权，不可单独提取分发；
-6 个 pip 依赖（FastAPI / uvicorn / httpx / pydantic / PyYAML / tzdata）各自适用其原始 MIT、BSD-3-Clause、Apache-2.0 许可，不随本仓库分发。
+右上角「服务」按钮：
+
+- **内核**：pid / 端口 / 运行时长；「重启内核」是延迟重启，面板 5–15 秒自己恢复
+- **NapCat**：小号登录态、版本；启动/停止/重启（要 UAC）；「登录二维码」直接给可扫的图
+- **语音**：模型、CUDA、上一次合成耗时、日志尾 200 行；不弹黑框
+- **模块**：列表 + 启停 + 热重载 + **在线安装**（贴 GitHub 链接或 `owner/repo` 直接装）
+- **记忆内核**：从哪来（加密容器 / 源码）、版本、容器指纹、记忆条数、库大小
+- **运行环境**：必装/可选依赖，缺哪个标红
+
+## 六、接 QQ
+
+需要 [NapCat](https://github.com/NapNeko/NapCatQQ)（第三方，自行安装，本项目不分发）：
+
+1. 面板「设置 → 连接」填 NapCat 安装目录与小号 QQ；
+2. 服务抽屉点「启动」→ 若弹 UAC 点允许；
+3. 点「登录二维码」扫码，或「快速登录」复用本机登录记录；
+4. NapCat 的上报地址要指向 `http://127.0.0.1:8787/onebot/event`（面板会自动改并备份）。
+
+只发自己的号测试就行；默认 `auto_accept_friend_request` 会通过好友申请，不需要可以在设置里关。
+
+## 七、语音与翻唱（可选）
+
+- **语音**：接一个兼容 `POST /v1/speech` + `GET /v1/jobs/{id}` 的本地服务（默认 `http://127.0.0.1:9880`）。
+  服务与权重**不随本项目分发**，见 `NOTICE.md`；没有它也能聊天，只是没有语音条。
+- **翻唱**：`demucs` + `yt-dlp` + RVC 音色模型，全在本机跑；下载内容版权归原平台/权利人。
+
+## 八、许可与声明
+
+- 许可：**SymBot 个人使用许可协议 1.1** —— 个人免费、禁止商用、记忆系统闭源、水印不可去。
+- 来源与第三方清单：`NOTICE.md`
+- 本仓库**不含**任何第三方模型权重、TTS/RVC 模型、表情包、NapCat 二进制；
+  使用者引入的第三方内容由使用者自行遵守其许可。
+
+## 九、常见问题
+
+**Q：双击没反应？**
+看 `data/launcher.log` / `data/last_serve.log`；多半是 Python 不在 PATH 或端口被占。
+
+**Q：面板能开，但 QQ 没反应？**
+先看服务抽屉里 NapCat 是否绿色、小号是否登录；再看 `onebot.enabled`。NapCat 需要管理员权限。
+
+**Q：回答很傻/答非所问？**
+没有填 API Key，正在 mock 模式（只会从人设语料里挑固定句子）。设置里填 Key 即可。
+
+**Q：要不要显卡？**
+不要。核心只用 CPU；语音/翻唱才需要 GPU，且是可选件。
+
+**Q：我的数据会被上传吗？**
+只有你主动配置的模型/搜索接口会收到必要文本；本地服务（记忆、面板、SQLite）不出网。mock 模式完全离线。
+
+---
+
+- 上手指南（详细版）：[上手指南.md](上手指南.md)
+- 开发者文档：[开发者文档.md](开发者文档.md)
+- 文档索引：[docs/README.md](docs/README.md)
