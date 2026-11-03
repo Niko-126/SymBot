@@ -299,6 +299,10 @@ class VoiceCfg:
     enabled: bool = False
     base_url: str = "http://127.0.0.1:9880"
     api_key: str = ""
+    #: 语音服务根目录（就是含 `.venv\Scripts\python.exe` 和 `configs\voice_service.json` 的那层）。
+    #: 留空 = 自动找：安装根（内核 exe 旁边）→ 数据根 → 解包目录；
+    #: 也可以在 data\voice-service-env.json 里由安装器写死。装到别处才需要填。
+    service_dir: str = ""
     voice: str = "feiyu"
     style: str = "cute"           # cute / gentle
     timeout_s: float = 60.0       # 单次合成等待上限（服务是异步作业）

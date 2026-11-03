@@ -92,6 +92,9 @@ voice:
   enabled: false
   base_url: http://127.0.0.1:9880
   api_key: ""
+  # 语音服务根目录（含 .venv\Scripts\python.exe 和 configs\voice_service.json 的那层）。
+  # 留空 = 自动找：内核 exe 旁边 → 数据根 → 解包目录；装到别处才需要填。
+  service_dir: ""
   voice: feiyu
   style: cute              # cute / gentle
   timeout_s: 60.0

@@ -27,7 +27,7 @@ import time
 from typing import Any
 from urllib.parse import urlparse
 
-from app.core.paths import DATA_ROOT, RESOURCE_ROOT
+from app.core.paths import BUNDLE_ROOT, DATA_ROOT, RESOURCE_ROOT, candidate_roots
 
 #: 内核进程启动时刻（本模块随内核一起 import，等价于"内核启动时间"）
 _KERNEL_BOOT_TS = time.time()
@@ -458,9 +458,83 @@ def start_napcat(qq: str = "", *, wait_s: float = 90.0) -> dict[str, Any]:
 
 # ---------------------------------------------------------------- 语音服务
 
+#: 语音服务相对位置（相对「安装根」，不是相对 _MEIPASS）
+_VOICE_REL = pathlib.Path(".third_party") / "feiyu_voice" / "server"
+#: venv 解释器相对语音服务根
+_VOICE_PY = pathlib.Path(".venv") / "Scripts" / "python.exe"
+#: 安装器写下的权威记录（data\voice-service-env.json）
+_VOICE_RECORD = "voice-service-env.json"
+
+
+def _voice_dir_candidates() -> list[pathlib.Path]:
+    """语音服务目录候选，按可信度排序。
+
+    为什么不是一行 `RESOURCE_ROOT / ".third_party" / ...`：
+    打包成 onefile 后 RESOURCE_ROOT 是 `%TEMP%\\_MEIxxxxxx`，而 `.third_party`
+    有 9 GB、根本不在包里——它躺在 `SymBotKernel.exe` **旁边**。
+    写死 RESOURCE_ROOT，面板点「启动」就必然报
+    「语音服务没装：C:\\...\\_MEI0000e7742\\.third_party\\... 不存在」。
+    """
+    out: list[pathlib.Path] = []
+
+    def add(p: pathlib.Path) -> None:
+        p = pathlib.Path(p)
+        if p not in out:
+            out.append(p)
+
+    # 1) 显式配置：voice.service_dir（相对路径按数据根解析）
+    cfg_dir = str(getattr(_cfg().voice, "service_dir", "") or "").strip()
+    if cfg_dir:
+        p = pathlib.Path(cfg_dir).expanduser()
+        add(p if p.is_absolute() else pathlib.Path(DATA_ROOT) / p)
+
+    # 2) 环境变量：装到奇怪位置时兜底，不必改配置
+    env_dir = (os.environ.get("SYMEM_VOICE_DIR") or "").strip()
+    if env_dir:
+        add(pathlib.Path(env_dir))
+
+    # 3) 安装器留下的记录（data\voice-service-env.json，安装时已核对过一遍）
+    record: Any = {}
+    for candidate in (pathlib.Path(DATA_ROOT) / "data" / _VOICE_RECORD,
+                      pathlib.Path(DATA_ROOT) / _VOICE_RECORD,
+                      pathlib.Path(BUNDLE_ROOT) / "data" / _VOICE_RECORD):
+        try:
+            record = json.loads(candidate.read_text("utf-8"))
+            break
+        except (OSError, ValueError):
+            continue
+    if isinstance(record, dict):
+        root = str(record.get("voiceServiceRoot") or "").strip()
+        if root:
+            add(pathlib.Path(root))
+        venv_py = str(record.get("venvPython") or "").strip()
+        if venv_py:
+            p = pathlib.Path(venv_py)
+            if len(p.parents) >= 3:  # ...\\server\\.venv\\Scripts\\python.exe → ...\\server
+                add(p.parents[2])
+
+    # 4) 各候选根下的标准位置（安装根 = exe 旁边，排在数据根和解包目录前面）
+    for base in candidate_roots():
+        add(pathlib.Path(base) / _VOICE_REL)
+    return out
+
 
 def _voice_dir() -> pathlib.Path:
-    return pathlib.Path(RESOURCE_ROOT) / ".third_party" / "feiyu_voice" / "server"
+    """定位语音服务根目录：第一个 `.venv\\Scripts\\python.exe` 真存在的候选。"""
+    cands = _voice_dir_candidates()
+    for cand in cands:
+        try:
+            if (cand / _VOICE_PY).is_file():
+                return cand
+        except OSError:
+            continue
+    for cand in cands:
+        try:
+            if cand.is_dir():
+                return cand
+        except OSError:
+            continue
+    return cands[0] if cands else pathlib.Path(BUNDLE_ROOT) / _VOICE_REL
 
 
 def _voice_port() -> int:
@@ -476,9 +550,14 @@ def _voice_http(path: str, *, auth: bool = False, timeout: float = 6.0) -> dict[
         if not base:
             return None
         headers = {}
-        key = str(getattr(box, "api_key", "") or "")
-        if auth and key:
-            headers["Authorization"] = f"Bearer {key}"
+        if auth:
+            # key 不只在配置里：声音服务第一次启动会把 key 写进
+            # <服务根>\.runtime\voice-service\api_key.txt，要能自己找出来。
+            from app.voice.auth import resolve_api_key
+
+            key = resolve_api_key(box)
+            if key:
+                headers["Authorization"] = f"Bearer {key}"
         with httpx.Client(timeout=timeout, trust_env=False) as client:
             resp = client.get(f"{base}{path}", headers=headers)
             if not resp.is_success:
@@ -574,11 +653,14 @@ def start_voice(*, wait_s: float = 90.0) -> dict[str, Any]:
     if _port_open(port):
         return {"ok": True, "target": "voice", "action": "start", "already": True, "port": port}
     srv = _voice_dir()
-    python = srv / ".venv" / "Scripts" / "python.exe"
-    if not python.exists():
+    python = srv / _VOICE_PY
+    if not python.is_file():
+        tried = "；".join(str(c) for c in _voice_dir_candidates()) or "（无候选）"
         return {"ok": False, "target": "voice", "action": "start",
-                "reason": f"语音服务没装：{srv}\\.venv\\Scripts\\python.exe 不存在"
-                          "（第三方权重不随本项目分发，见 docs/30 第六节）"}
+                "reason": f"语音服务没装：{python} 不存在"
+                          f"（第三方权重不随本项目分发，见 docs/30 第六节；"
+                          f"已按顺序找过：{tried}。"
+                          "装到别处就在 config.local.yaml 里加 voice.service_dir 指过去）"}
     config_file = srv / "configs" / "voice_service.json"
     if not config_file.exists():
         return {"ok": False, "target": "voice", "action": "start",

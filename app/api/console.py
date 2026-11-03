@@ -827,6 +827,34 @@ def console_status() -> dict[str, Any]:
 # ---------------------------------------------------------------- NapCat 登录 / 好友同步
 
 
+def _onebot_off_detail(*, short: bool = False) -> str:
+    """onebot 关着的时候，说清「到底是没开，还是被运行环境强制关了」。
+
+    坑（2026-11-03 真机）：config.yaml 默认 `environment: test`，而 test 环境在
+    `app/core/config.py::_apply_env` 里会 **强制** `onebot.enabled = False`。
+    老文案只让人「去 config.yaml 打开 onebot.enabled」，照着改了也没用——
+    改那一行救不了，得切 prod。这里把两种原因分开说。
+    """
+    rt = get_runtime()
+    env = str(getattr(rt.cfg, "environment", "") or "").lower()
+    if env in ("test", "debug"):
+        if short:
+            return f"onebot 被 {env} 环境强制关闭（配置里开也没用）—— 要用「生产模式-启动.bat」"
+        return (
+            f"onebot 没启用：当前是 {env} 环境（独立测试库），内核会强制关掉 OneBot，"
+            "config.yaml 里把 enabled 改成 true 也不会生效。要连 QQ 二选一："
+            "① 双击安装目录的「生产模式-启动.bat」；"
+            "② 在 config.local.yaml 里写 environment: prod，再重启内核（面板 › 服务 › 内核 › 重启）"
+        )
+    if short:
+        return "onebot 没启用（config.local.yaml: onebot.enabled）"
+    return (
+        "onebot 没启用：在 <安装目录>\\config.local.yaml 里加\n"
+        "onebot:\n  enabled: true\n  api_base: http://127.0.0.1:3000\n  self_id: '<小号 QQ>'\n"
+        "然后面板 › 服务 › 内核 › 重启"
+    )
+
+
 @router.get("/groups")
 def groups_list(limit: int = Query(20, ge=1, le=100)) -> dict[str, Any]:
     """已知群号（从聊天记录里来）——群聊发送时给前端做下拉，不用手打。"""
@@ -848,7 +876,7 @@ async def group_members(group_id: int) -> dict[str, Any]:
     """拉这个群的成员，分「已认识 / 还没认识」。"""
     cfg = get_runtime().cfg.onebot
     if not bool(getattr(cfg, "enabled", False)):
-        raise HTTPException(status_code=400, detail="onebot 没启用")
+        raise HTTPException(status_code=400, detail=_onebot_off_detail())
     from app.api.onebot import get_group_members
 
     items = await get_group_members(cfg, group_id)
@@ -868,7 +896,7 @@ async def group_greet(group_id: int, limit: int = Query(3, ge=1, le=10)) -> dict
     """把群里还没认识的人拉进来，主动 @ 招呼（一次最多 limit 个，每人只招呼一次）。"""
     cfg = get_runtime().cfg.onebot
     if not bool(getattr(cfg, "enabled", False)):
-        raise HTTPException(status_code=400, detail="onebot 没启用")
+        raise HTTPException(status_code=400, detail=_onebot_off_detail())
     from app.api.onebot import _post_api, get_group_members
     from app.memory import store
     from app.relation import greet as greet_mod
@@ -923,7 +951,7 @@ async def onebot_login() -> dict[str, Any]:
     cfg = get_runtime().cfg.onebot
     if not bool(getattr(cfg, "enabled", False)):
         return {"ok": True, "enabled": False, "online": False,
-                "reason": "onebot 没启用（config.yaml: onebot.enabled）"}
+                "reason": _onebot_off_detail(short=True)}
     from app.api.onebot import get_login_info
 
     info = await get_login_info(cfg)
@@ -937,7 +965,7 @@ async def onebot_sync() -> dict[str, Any]:
     rt = get_runtime()
     cfg = rt.cfg.onebot
     if not bool(getattr(cfg, "enabled", False)):
-        raise HTTPException(status_code=400, detail="onebot 没启用：先在 config.yaml 打开 onebot.enabled")
+        raise HTTPException(status_code=400, detail=_onebot_off_detail())
     from app.api.onebot import get_friend_list
 
     items = await get_friend_list(cfg)

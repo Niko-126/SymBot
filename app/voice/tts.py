@@ -29,6 +29,8 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
+from app.voice.auth import resolve_api_key
+
 _MAX_AUDIO_BYTES = 16 * 1024 * 1024
 
 # 独立的合成线程池：TTS 走自己的一条线，**不跟聊天模型/其它 to_thread 抢默认线程池**。
@@ -152,7 +154,8 @@ def synth_sync(cfg: Any, text: str, *, voice: str = "", style: str = "",
     _t0 = time.monotonic()
 
     base = str(getattr(box, "base_url", "") or "").rstrip("/")
-    key = str(getattr(box, "api_key", "") or "")
+    # key：配置 → 环境变量 → 服务自己写的 api_key.txt（不然 /v1/speech 必然 401）
+    key = resolve_api_key(box)
     timeout = float(getattr(box, "timeout_s", 60.0) or 60.0)
     payload = {
         "voice": (voice or str(getattr(box, "voice", "feiyu") or "feiyu")).strip(),

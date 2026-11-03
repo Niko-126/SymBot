@@ -162,9 +162,9 @@ def _run(cmd: list[str], *, timeout: float, cwd: pathlib.Path | None = None) -> 
 def _ffmpeg() -> str:
     """优先用随包 ffmpeg（tools/ffmpeg.exe），其次 PATH 里的。"""
     try:
-        from app.core.paths import DATA_ROOT, RESOURCE_ROOT
+        from app.core.paths import candidate_roots
 
-        for base in (DATA_ROOT, RESOURCE_ROOT):
+        for base in candidate_roots():
             cand = pathlib.Path(base) / "tools" / "ffmpeg.exe"
             if cand.is_file():
                 return str(cand)
@@ -507,26 +507,10 @@ def _svc_settings(cfg: Any) -> tuple[str, str, str]:
 
 
 def _key_from_file() -> str:
-    for name in ("SYMEM_VOICE_KEY", "FEIYU_VOICE_KEY"):
-        cand = (os.environ.get(name) or "").strip()
-        if cand:
-            return cand
-    rel = pathlib.Path(".third_party") / "feiyu_voice" / "server" / ".runtime" / "voice-service" / "api_key.txt"
-    roots: list[pathlib.Path] = []
-    try:
-        from app.core.paths import DATA_ROOT, RESOURCE_ROOT
+    """翻唱用的 key：和 TTS 共用同一套解析（环境变量 → 服务自己写的 api_key.txt）。"""
+    from app.voice.auth import resolve_api_key
 
-        roots = [pathlib.Path(DATA_ROOT), pathlib.Path(RESOURCE_ROOT)]
-    except Exception:  # noqa: BLE001
-        roots = [pathlib.Path.cwd()]
-    for root in roots:
-        cand = root / rel
-        try:
-            if cand.is_file():
-                return cand.read_text(encoding="utf-8").strip()
-        except OSError:
-            continue
-    return ""
+    return resolve_api_key()
 
 
 def _rvc(cfg: Any, vocals: pathlib.Path, dest: pathlib.Path, *,
